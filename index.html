@@ -23,11 +23,13 @@
             border: 1px solid #d3d3d3;
         }
     </style>
+    
+    <!-- Add crossorigin attribute to allow CORS for fonts -->
+    <link rel="stylesheet" href="https://cdn.jotfor.ms/opt/google-fonts/Roboto/KFOlCnqEu92Fr1MmWUlfBBc4AMP6lQ.woff2" crossorigin="anonymous">
 </head>
 <body>
     <div id="main">
-        <h3>This is my first widget.</h3>
-        <span id="labelText"></span>
+        <h3 id="labelText"></h3>
         <!-- The phone input field where users will enter their number -->
         <input type="tel" id="phoneInput">
         <!-- Placeholder for displaying error messages -->
