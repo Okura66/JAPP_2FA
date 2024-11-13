@@ -66,38 +66,36 @@
         phoneInput.addEventListener('close:countrydropdown', function() {
             JFCustomWidget.requestFrameResize({ height: 140 }); // Reset height to original or desired value
         });
-
-        // Subscribe to the "submit" event to validate and send data when the form is submitted
-        JFCustomWidget.subscribe("submit", function(){
-            if (iti.isValidNumber()) {
-                console.log("Phone number is valid:", iti.isValidNumber());
-                
-                try {
-                    var fullNumber = iti.getNumber();
-                    if (fullNumber) {
-                        var msg = {
-                            valid: true,
-                            value: fullNumber // Retrieve the full phone number with the country code
-                        };
-                        console.log("Sending submit message:", msg);
-                        JFCustomWidget.sendSubmit(msg);
-                    } else {
-                        console.error("Full phone number is null.");
-                    }
-                } catch (error) {
-                    console.error("Error sending submit message:", error);
-                }
-                
-            } else {
-                console.log("Phone number is not valid.");
-                // Display error message
-                errorMsg.innerHTML = "Veuillez entrer un numéro de téléphone valide.";
-                // Mark the widget as invalid so the form does not submit
-                var msg = { valid: false, value: "" };
-                JFCustomWidget.sendSubmit(msg);
-            }
-        });
     });
+
+    //subscribe to submit event
+    JFCustomWidget.subscribe("submit", function(){
+        //prepare your data
+        var data = {};
+        if (iti.isValidNumber()) {
+            try {
+                var fullNumber = iti.getNumber();
+                if (fullNumber) {
+                    data.valid = true;
+                    data.value = fullNumber; // Retrieve the full phone number with the country code
+                } else {
+                    console.error("Full phone number is null.");
+                    data.valid = false;
+                    data.value = "";
+                }
+            } catch (error) {
+                console.error("Error retrieving phone number:", error);
+                data.valid = false;
+                data.value = "";
+            }
+        } else {
+            console.log("Phone number is not valid.");
+            data.valid = false;
+            data.value = "";
+        }
+        
+        JFCustomWidget.sendResult(data);      
+    });   
 </script>
 </body>
 </html>
