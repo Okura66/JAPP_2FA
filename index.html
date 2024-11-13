@@ -47,10 +47,15 @@
                     const phoneNumber = iti.getNumber();
                     const isValid = iti.isValidNumber();
 
-                    // Bloque la soumission si le numéro n'est pas valide
+                    // Bloque la soumission si le numéro n'est pas valide et affiche un message d'alerte
+                    if (!isValid) {
+                        alert("The phone number entered is not valid. Please check and try again.");
+                        return;
+                    }
+
                     const msg = {
                         valid: isValid,
-                        value: isValid ? phoneNumber : ""
+                        value: phoneNumber
                     };
                     JFCustomWidget.sendSubmit(msg);
                 });
