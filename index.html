@@ -58,13 +58,6 @@
         phoneInput.addEventListener('keyup', resetError);
         phoneInput.addEventListener('focus', resetError);
 
-        // Ajuster la hauteur de l'iframe après l'initialisation
-        setTimeout(function() {
-            JFCustomWidget.requestFrameResize({
-                height: document.body.scrollHeight
-            });
-        }, 100);
-
         JFCustomWidget.subscribe("submit", function(){
             if (iti.isValidNumber()) {
                 var msg = {
