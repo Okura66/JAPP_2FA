@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <!-- Load the JotForm Custom Widget API -->
+    <!-- Charger l'API du widget personnalisé JotForm -->
     <script src="//js.jotform.com/JotFormCustomWidget.min.js"></script>
     
-    <!-- Load intl-tel-input CSS for styling the phone input field -->
+    <!-- Charger le CSS de intl-tel-input pour le style du champ de saisie téléphonique -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@24.7.0/build/css/intlTelInput.css">
     <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@24.7.0/build/js/intlTelInput.min.js"></script>
 
-    <!-- Custom CSS for error message styling and phone input field -->
+    <!-- CSS personnalisé pour le style du message d'erreur et du champ de saisie téléphonique -->
     <style>
         .error-message {
             color: red;
@@ -24,10 +24,10 @@
 </head>
 <body>
     <div id="main">
-        <h3 id="labelText">This is my first widget.</h3>
-        <!-- The phone input field where users will enter their number -->
+        <h3 id="labelText">Ceci est mon premier widget.</h3>
+        <!-- Champ de saisie téléphonique où les utilisateurs entreront leur numéro -->
         <input type="tel" id="phoneInput">
-        <!-- Placeholder for displaying error messages -->
+        <!-- Espace réservé pour afficher les messages d'erreur -->
         <div id="errorMsg" class="error-message"></div>
     </div>
 
@@ -46,44 +46,53 @@
             fixDropdownWidth: true,
             strictMode: true,
             validationNumberType: "MOBILE",
-            dropdownContainer: document.body // Append the country dropdown to the body
+            dropdownContainer: document.body // Ajouter le menu déroulant des pays au corps du document
         });
 
-        function resetError() {
-            errorMsg.innerHTML = "";
+        // Fonction pour afficher le message d'erreur
+        function showError(message) {
+            errorMsg.innerHTML = message;
         }
 
-        // Add event listeners to reset error message on input change or focus
-        phoneInput.addEventListener('change', resetError);
-        phoneInput.addEventListener('keyup', resetError);
-        phoneInput.addEventListener('focus', resetError);
+        // Fonction pour valider le numéro de téléphone
+        function validatePhoneNumber() {
+            if (iti.isValidNumber()) {
+                errorMsg.innerHTML = "";
+                return true;
+            } else {
+                showError("Veuillez entrer un numéro de téléphone valide.");
+                return false;
+            }
+        }
 
-        // Add event listener to resize iframe when the dropdown is opened
+        // Ajouter un écouteur d'événement pour la validation en temps réel
+        phoneInput.addEventListener('input', function() {
+            validatePhoneNumber();
+        });
+
+        // Ajouter un écouteur d'événement pour redimensionner l'iframe lorsque le menu déroulant est ouvert
         phoneInput.addEventListener('open:countrydropdown', function() {
-            JFCustomWidget.requestFrameResize({ height: 320 }); // Adjust height as needed
+            JFCustomWidget.requestFrameResize({ height: 320 }); // Ajuster la hauteur si nécessaire
         });
 
         phoneInput.addEventListener('close:countrydropdown', function() {
-            JFCustomWidget.requestFrameResize({ height: 140 }); // Reset height to original or desired value
+            JFCustomWidget.requestFrameResize({ height: 140 }); // Réinitialiser la hauteur à la valeur d'origine ou souhaitée
         });
 
-        // Subscribe to the "submit" event to validate and send data when the form is submitted
+        // S'abonner à l'événement "submit" pour valider et envoyer les données lors de la soumission du formulaire
         JFCustomWidget.subscribe("submit", function(){
-            // Check if the entered phone number is valid according to the selected country
-            if (iti.isValidNumber()) {
-                // If valid, create a message with the required attributes
+            // Valider le numéro de téléphone avant la soumission
+            if (validatePhoneNumber()) {
+                // Si valide, créer un message avec les attributs requis
                 var msg = {
-                    valid: true, // Set valid to true to pass JotForm's required validation
-                    value: iti.getNumber() // Retrieve the full phone number with the country code
+                    valid: true, // Définir valid à true pour passer la validation requise de JotForm
+                    value: iti.getNumber() // Récupérer le numéro de téléphone complet avec l'indicatif pays
                 };
-                // Send the valid phone number to JotForm
+                // Envoyer le numéro de téléphone valide à JotForm
                 JFCustomWidget.sendSubmit(msg);
             } else {
-                // If the phone number is invalid, display an error message below the input field
-                errorMsg.innerHTML = "Veuillez entrer un numéro de téléphone valide.";
-                // Mark the widget as invalid so the form does not submit
-                var msg = { valid: false };
-                JFCustomWidget.sendSubmit(msg);
+                // Si le numéro de téléphone est invalide, empêcher la soumission du formulaire
+                JFCustomWidget.sendSubmit({ valid: false });
             }
         });
     });
