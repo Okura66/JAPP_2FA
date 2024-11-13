@@ -23,15 +23,12 @@
             border: 1px solid #d3d3d3;
         }
     </style>
-    
-    <!-- Add crossorigin attribute to allow CORS for fonts -->
-    <link rel="stylesheet" href="https://cdn.jotfor.ms/opt/google-fonts/Roboto/KFOlCnqEu92Fr1MmWUlfBBc4AMP6lQ.woff2" crossorigin="anonymous">
 </head>
 <body>
     <div id="main">
-        <h3 id="labelText"></h3>
+        <h3 id="labelText">This is my first widget.</h3>
         <!-- The phone input field where users will enter their number -->
-        <input id="phoneInput" type="tel">
+        <input type="tel" id="phoneInput">
         <!-- Placeholder for displaying error messages -->
         <div id="errorMsg" class="error-message"></div>
     </div>
@@ -54,24 +51,31 @@
             errorMsg.innerHTML = "";
         }
 
-        phoneInput.addEventListener('change', resetError);
-        phoneInput.addEventListener('keyup', resetError);
-        phoneInput.addEventListener('focus', resetError);
+            // Add event listeners to reset error message on input change or focus
+            phoneInput.addEventListener('change', resetError);
+            phoneInput.addEventListener('keyup', resetError);
+            phoneInput.addEventListener('focus', resetError);
 
-        JFCustomWidget.subscribe("submit", function(){
-            if (iti.isValidNumber()) {
-                var msg = {
-                    valid: true,
-                    value: iti.getNumber()
-                };
-                JFCustomWidget.sendSubmit(msg);
-            } else {
-                errorMsg.innerHTML = "Veuillez entrer un numéro de téléphone valide.";
-                var msg = { valid: false };
-                JFCustomWidget.sendSubmit(msg);
-            }
+            // Subscribe to the "submit" event to validate and send data when the form is submitted
+            JFCustomWidget.subscribe("submit", function(){
+                // Check if the entered phone number is valid according to the selected country
+                if (iti.isValidNumber()) {
+                    // If valid, create a message with the required attributes
+                    var msg = {
+                        valid: true, // Set valid to true to pass JotForm's required validation
+                        value: iti.getNumber() // Retrieve the full phone number with the country code
+                    };
+                    // Send the valid phone number to JotForm
+                    JFCustomWidget.sendSubmit(msg);
+                } else {
+                    // If the phone number is invalid, display an error message below the input field
+                    errorMsg.innerHTML = "Please enter a valid phone number.";
+                    // Mark the widget as invalid so the form does not submit
+                    var msg = { valid: false };
+                    JFCustomWidget.sendSubmit(msg);
+                }
+            });
         });
-    });
-</script>
+    </script>
 </body>
 </html>
