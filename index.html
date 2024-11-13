@@ -3,21 +3,11 @@
 <head>
     <!-- Load the JotForm Custom Widget API -->
     <script src="//js.jotform.com/JotFormCustomWidget.min.js"></script>
-    
-    <!-- Load intl-tel-input CSS for styling the phone input field -->
+    <!-- Load intl-tel-input CSS and JS for phone input functionality -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css" />
-    
-    <!-- Load intl-tel-input JavaScript library for phone input functionality -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
-    
     <!-- Custom CSS for error message styling -->
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400&display=swap');
-        
-        body {
-            font-family: 'Roboto', sans-serif;
-        }
-
         .error-message {
             color: red;
             font-size: 0.9em;
@@ -28,26 +18,25 @@
 <body>
     <div id="main">
         <h3>Please enter your phone number</h3>
-        <!-- The phone input field where users will enter their number -->
+        <!-- Phone input field -->
         <input type="tel" id="phoneInput">
-        <!-- Placeholder for displaying error messages -->
+        <!-- Error message container -->
         <div id="errorMsg" class="error-message"></div>
     </div>
 
     <script type="text/javascript">
-        // Subscribe to the "ready" event to initialize the widget when it's fully loaded
+        // Subscribe to the "ready" event to initialize the widget
         JFCustomWidget.subscribe("ready", function(){
-            // Select the phone input field
+            // Select the phone input field and error message container
             var phoneInput = document.querySelector("#phoneInput");
-            // Select the error message div
             var errorMsg = document.querySelector("#errorMsg");
 
             // Initialize intl-tel-input with desired settings
             var iti = window.intlTelInput(phoneInput, {
-                initialCountry: "fr", // Set the default country to France
-                separateDialCode: true, // Display the country dial code separately from the phone number
+                initialCountry: "fr", // Set default country to France
+                separateDialCode: true, // Display country dial code separately
                 strictMode: true,
-                utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js" // Load additional utilities for validation
+                utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js" // Load utilities for validation
             });
 
             // Function to reset the error message
@@ -60,23 +49,36 @@
             phoneInput.addEventListener('keyup', resetError);
             phoneInput.addEventListener('focus', resetError);
 
-            // Subscribe to the "submit" event to validate and send data when the form is submitted
+            // Function to adjust the iframe size based on content
+            function adjustIframeSize() {
+                // Get the height of the main content
+                var contentHeight = document.getElementById('main').offsetHeight;
+                // Request the parent frame to resize the iframe
+                JFCustomWidget.requestFrameResize({
+                    height: contentHeight + 20 // Add some padding
+                });
+            }
+
+            // Adjust iframe size on initial load
+            adjustIframeSize();
+
+            // Adjust iframe size when window is resized
+            window.addEventListener('resize', adjustIframeSize);
+
+            // Subscribe to the "submit" event to validate and send data
             JFCustomWidget.subscribe("submit", function(){
-                // Check if the entered phone number is valid according to the selected country
+                // Check if the entered phone number is valid
                 if (iti.isValidNumber()) {
-                    // If valid, create a message with the required attributes
-                    var msg = {
-                        valid: true, // Set valid to true to pass JotForm's required validation
-                        value: iti.getNumber() // Retrieve the full phone number with the country code
-                    };
-                    // Send the valid phone number to JotForm
-                    JFCustomWidget.sendSubmit(msg);
+                    // Send valid data to JotForm
+                    JFCustomWidget.sendSubmit({
+                        valid: true,
+                        value: iti.getNumber() // Get full phone number with country code
+                    });
                 } else {
-                    // If the phone number is invalid, display an error message below the input field
-                    errorMsg.innerHTML = "Please enter a valid phone number.";
-                    // Mark the widget as invalid so the form does not submit
-                    var msg = { valid: false };
-                    JFCustomWidget.sendSubmit(msg);
+                    // Display error message
+                    errorMsg.innerHTML = "Veuillez entrer un numéro de téléphone valide.";
+                    // Prevent form submission
+                    JFCustomWidget.sendSubmit({ valid: false });
                 }
             });
         });
