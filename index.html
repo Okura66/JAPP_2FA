@@ -12,6 +12,12 @@
     
     <!-- Custom CSS for error message styling -->
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400&display=swap');
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+        }
+
         .error-message {
             color: red;
             font-size: 0.9em;
@@ -40,7 +46,7 @@
             var iti = window.intlTelInput(phoneInput, {
                 initialCountry: "fr", // Set the default country to France
                 separateDialCode: true, // Display the country dial code separately from the phone number
-                onlyCountries: ["fr", "us", "gb", "de", "es"], // Restrict selectable countries
+                strictMode: true,
                 utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js" // Load additional utilities for validation
             });
 
