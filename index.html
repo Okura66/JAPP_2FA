@@ -4,7 +4,6 @@
     <script src="//js.jotform.com/JotFormCustomWidget.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js"></script>
 </head>
 <body>
     <div id="main">
@@ -19,30 +18,9 @@
             var iti = window.intlTelInput(phoneInput, {
                 initialCountry: "fr",
                 separateDialCode: true,
+                strictMode: true,
+                //onlyCountries: ["fr", "us", "gb", "de", "es"], // Ajouter les pays autorisés ici
                 utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js" // Utilisé pour la validation
-            });
-
-            // Filtrage des caractères saisis
-            phoneInput.addEventListener('input', function() {
-                var cursorPosition = phoneInput.selectionStart;
-                var inputValue = phoneInput.value;
-
-                // Autoriser uniquement les chiffres et le signe plus au début
-                var filteredValue = inputValue.replace(/[^\d+]/g, '');
-
-                // Assurer que le signe plus est uniquement au début
-                if (filteredValue.indexOf('+') > 0) {
-                    filteredValue = filteredValue.replace(/\+/g, '');
-                }
-
-                // Limiter la longueur du numéro
-                var maxLength = iti.getNumber().length;
-                if (filteredValue.length > maxLength) {
-                    filteredValue = filteredValue.slice(0, maxLength);
-                }
-
-                phoneInput.value = filteredValue;
-                phoneInput.setSelectionRange(cursorPosition, cursorPosition);
             });
 
             // Validation lors de la soumission
