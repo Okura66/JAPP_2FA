@@ -22,20 +22,20 @@
 <body>
     <div id="main">
         <div>
-            <input type="tel" id="phoneInput" placeholder="Enter your phone number">
+            <input type="tel" id="phoneInput" placeholder="Entrez votre numéro de téléphone">
         </div>
     </div>
     
     <script type="text/javascript">
-        // Configuration et initialisation du champ de numéro de téléphone avec le sélecteur de pays
+        // Initialisation du champ de numéro de téléphone avec le sélecteur de pays
         intlTelInputScript.onload = function() {
             const phoneInputField = document.querySelector("#phoneInput");
             const iti = window.intlTelInput(phoneInputField, {
                 initialCountry: "fr",
                 nationalMode: true,
                 strictMode: true,
-                utilsScript: "/intl-tel-input/js/utils.js?1730730622316" // just for formatting/placeholders etc
-              });
+                utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js" // pour formatage et validation
+            });
 
             // Abonnement à l'événement "ready" de JotForm
             JFCustomWidget.subscribe("ready", function() {
@@ -49,21 +49,17 @@
 
                     // Bloque la soumission si le numéro n'est pas valide et affiche un message d'alerte
                     if (!isValid) {
-                        alert("The phone number entered is not valid. Please check and try again.");
+                        alert("Le numéro de téléphone saisi n'est pas valide. Veuillez vérifier et réessayer.");
+                        JFCustomWidget.sendSubmit({ valid: false, value: "" });
                         return;
                     }
 
-                    const msg = {
-                        valid: isValid,
+                    // Envoi du résultat si le numéro est valide
+                    JFCustomWidget.sendSubmit({
+                        valid: true,
                         value: phoneNumber
-                    };
-                    JFCustomWidget.sendSubmit(msg);
+                    });
                 });
-            });
-
-            // Remove the limit for the number of digits
-            phoneInputField.addEventListener('countrychange', function() {
-                // No maxLength setting here
             });
         };
     </script>
