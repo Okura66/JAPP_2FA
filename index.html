@@ -20,7 +20,6 @@
 </head>
 <body>
     <div id="main">
-        <h3>Phone Number Entry with Country Selector</h3>
         <div>
             <input type="tel" id="phoneInput" placeholder="Enter your phone number">
         </div>
@@ -32,12 +31,6 @@
             const phoneInputField = document.querySelector("#phoneInput");
             const iti = window.intlTelInput(phoneInputField, {
                 initialCountry: "us",
-                geoIpLookup: function(callback) {
-                    fetch('https://ipinfo.io/json?token=d8a254072a99d3') // Remplacez YOUR_TOKEN par votre jeton d'accès ipinfo.io
-                        .then(response => response.json())
-                        .then(data => callback(data.country))
-                        .catch(() => callback("fr"));
-                },
                 utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js"
             });
 
