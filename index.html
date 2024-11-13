@@ -70,10 +70,9 @@
                 JFCustomWidget.requestFrameResize({ height: 140 }); // Reset height to original or desired value
             });
 
-            // Subscribe to the "submit" event to verify and send data when the form is submitted
+            // Subscribe to the "submit" event to validate and send data when the form is submitted
             JFCustomWidget.subscribe("submit", function () {
-                var msg = { valid: false, value: "" }; // Default message object
-
+                var msg;
                 if (iti.isValidNumber()) {
                     console.log("Phone number is valid:", iti.isValidNumber());
 
@@ -87,19 +86,23 @@
                             console.log("Sending submit message:", msg);
                         } else {
                             console.error("Full phone number is null.");
+                            msg = { valid: false, value: "" };
                         }
                     } catch (error) {
                         console.error("Error sending submit message:", error);
+                        msg = { valid: false, value: "" };
                     }
 
                 } else {
                     console.log("Phone number is not valid.");
                     // Display error message
                     errorMsg.innerHTML = "Veuillez entrer un numéro de téléphone valide.";
+                    // Mark the widget as invalid so the form does not submit
+                    msg = { valid: false, value: "" };
                 }
-                
                 JFCustomWidget.sendSubmit(msg);
             });
+        });
     </script>
 </body>
 
