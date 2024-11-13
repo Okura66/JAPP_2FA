@@ -31,26 +31,38 @@
             const phoneInputField = document.querySelector("#phoneInput");
             const iti = window.intlTelInput(phoneInputField, {
                 initialCountry: "us",
-                utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js"
+                utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
+                nationalMode: true,
+                formatOnDisplay: true
             });
 
-            // Gestionnaire de soumission du formulaire pour valider et envoyer les informations de téléphone
-            JFCustomWidget.subscribe("submit", function() {
-                const phoneNumber = iti.getNumber();
-                const isValid = iti.isValidNumber();
+            // Abonnement à l'événement "ready" de JotForm
+            JFCustomWidget.subscribe("ready", function() {
+                var label = JFCustomWidget.getWidgetSetting('QuestionLabel');
+                document.getElementById('labelText').innerHTML = label;
 
-                const msg = {
-                    valid: isValid,
-                    value: isValid ? phoneNumber : "Invalid phone number"
-                };
-                JFCustomWidget.sendSubmit(msg);
+                // Gestionnaire de soumission du formulaire pour valider et envoyer les informations de téléphone
+                JFCustomWidget.subscribe("submit", function() {
+                    const phoneNumber = iti.getNumber();
+                    const isValid = iti.isValidNumber();
+
+                    const msg = {
+                        valid: isValid,
+                        value: isValid ? phoneNumber : "Invalid phone number"
+                    };
+                    JFCustomWidget.sendSubmit(msg);
+                });
+            });
+
+            // Limiter la saisie en fonction de l'indicatif du pays
+            phoneInputField.addEventListener('input', function() {
+                const countryData = iti.getSelectedCountryData();
+                const maxLength = countryData.dialCode.length + 10; // Adjust length based on country code
+                if (phoneInputField.value.length > maxLength) {
+                    phoneInputField.value = phoneInputField.value.slice(0, maxLength);
+                }
             });
         };
-
-        // Abonnement à l'événement "ready" de JotForm
-        JFCustomWidget.subscribe("ready", function() {
-            // Vous pouvez également définir d'autres paramètres si besoin
-        });
     </script>
 </body>
 </html>
