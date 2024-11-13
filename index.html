@@ -36,8 +36,8 @@
 
 <script type="text/javascript">
     JFCustomWidget.subscribe("ready", function(){
-        var WidgetLabel = JFCustomWidget.getWidgetSetting('WidgetLabel');
-        document.getElementById('WidgetLabel').innerHTML = WidgetLabel;
+        var label = JFCustomWidget.getWidgetSetting('WidgetLabel');
+        document.getElementById('labelText').innerHTML = label;
         var phoneInput = document.querySelector("#phoneInput");
         var errorMsg = document.querySelector("#errorMsg");
 
