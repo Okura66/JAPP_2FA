@@ -10,33 +10,22 @@
     <!-- Load intl-tel-input JavaScript library for phone input functionality -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
     
-    <!-- Custom CSS for error message styling and default styling for intl-tel-input -->
+    <!-- Custom CSS for error message styling and phone input field -->
     <style>
         .error-message {
             color: red;
             font-size: 0.9em;
             margin-top: 5px;
         }
-        .intl-tel-input {
-            font-size: 14px;
-            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-            color: #333;
-        }
-        .intl-tel-input input {
-            border: 1px solid #ccc;
-            font-family: inherit;
-            font-size: 100%;
-            color: inherit;
-            line-height: 25px;
-        }
-        #telephone_input {
+        #phoneInput {
             width: 100%;
+            height: 30px;
+            border: 1px solid #d3d3d3;
         }
     </style>
 </head>
 <body>
     <div id="main">
-        <h3>Please enter your phone number</h3>
         <!-- The phone input field where users will enter their number -->
         <input type="tel" id="phoneInput">
         <!-- Placeholder for displaying error messages -->
@@ -82,7 +71,7 @@
                     JFCustomWidget.sendSubmit(msg);
                 } else {
                     // If the phone number is invalid, display an error message below the input field
-                    errorMsg.innerHTML = "Please enter a valid phone number.";
+                    errorMsg.innerHTML = "Veuillez entrer un numéro de téléphone valide.";
                     // Mark the widget as invalid so the form does not submit
                     var msg = { valid: false };
                     JFCustomWidget.sendSubmit(msg);
