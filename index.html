@@ -31,7 +31,7 @@
     <div id="main">
         <h3 id="labelText"></h3>
         <!-- The phone input field where users will enter their number -->
-        <input type="tel" id="phoneInput">
+        <input id="phoneInput" type="tel">
         <!-- Placeholder for displaying error messages -->
         <div id="errorMsg" class="error-message"></div>
     </div>
@@ -45,9 +45,8 @@
 
         var iti = window.intlTelInput(phoneInput, {
             initialCountry: "fr",
-            separateDialCode: true,
             strictMode: true,
-            utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js"
+            utilsScript: "/intl-tel-input/js/utils.js"
         });
 
         function resetError() {
