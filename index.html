@@ -43,7 +43,6 @@
             initialCountry: "fr",
             useFullscreenPopup: false,
             countrySearch: true,
-            separateDialCode: true,
             fixDropdownWidth: true,
             strictMode: true,
             validationNumberType: "MOBILE",
@@ -54,31 +53,36 @@
             errorMsg.innerHTML = "";
         }
 
-            // Add event listeners to reset error message on input change or focus
-            phoneInput.addEventListener('change', resetError);
-            phoneInput.addEventListener('keyup', resetError);
-            phoneInput.addEventListener('focus', resetError);
+        // Add event listeners to reset error message on input change or focus
+        phoneInput.addEventListener('change', resetError);
+        phoneInput.addEventListener('keyup', resetError);
+        phoneInput.addEventListener('focus', resetError);
 
-            // Subscribe to the "submit" event to validate and send data when the form is submitted
-            JFCustomWidget.subscribe("submit", function(){
-                // Check if the entered phone number is valid according to the selected country
-                if (iti.isValidNumber()) {
-                    // If valid, create a message with the required attributes
-                    var msg = {
-                        valid: true, // Set valid to true to pass JotForm's required validation
-                        value: iti.getNumber() // Retrieve the full phone number with the country code
-                    };
-                    // Send the valid phone number to JotForm
-                    JFCustomWidget.sendSubmit(msg);
-                } else {
-                    // If the phone number is invalid, display an error message below the input field
-                    errorMsg.innerHTML = "Veuillez entrer un numéro de téléphone valide.";
-                    // Mark the widget as invalid so the form does not submit
-                    var msg = { valid: false };
-                    JFCustomWidget.sendSubmit(msg);
-                }
-            });
+        // Add event listener to resize iframe when the dropdown is opened
+        phoneInput.addEventListener('open:countrydropdown', function() {
+            JFCustomWidget.requestFrameResize({ height: 400 }); // Adjust height as needed
         });
-    </script>
+
+        // Subscribe to the "submit" event to validate and send data when the form is submitted
+        JFCustomWidget.subscribe("submit", function(){
+            // Check if the entered phone number is valid according to the selected country
+            if (iti.isValidNumber()) {
+                // If valid, create a message with the required attributes
+                var msg = {
+                    valid: true, // Set valid to true to pass JotForm's required validation
+                    value: iti.getNumber() // Retrieve the full phone number with the country code
+                };
+                // Send the valid phone number to JotForm
+                JFCustomWidget.sendSubmit(msg);
+            } else {
+                // If the phone number is invalid, display an error message below the input field
+                errorMsg.innerHTML = "Veuillez entrer un numéro de téléphone valide.";
+                // Mark the widget as invalid so the form does not submit
+                var msg = { valid: false };
+                JFCustomWidget.sendSubmit(msg);
+            }
+        });
+    });
+</script>
 </body>
 </html>
