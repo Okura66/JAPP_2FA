@@ -69,39 +69,37 @@
             phoneInput.addEventListener('close:countrydropdown', function () {
                 JFCustomWidget.requestFrameResize({ height: 140 }); // Reset height to original or desired value
             });
-        });
 
-        // Subscribe to the "submit" event to validate and send data when the form is submitted
-        JFCustomWidget.subscribe("submit", function () {
-            if (iti.isValidNumber()) {
-                console.log("Phone number is valid:", iti.isValidNumber());
+            // Subscribe to the "submit" event to verify and send data when the form is submitted
+            JFCustomWidget.subscribe("submit", function () {
+                var msg = { valid: false, value: "" }; // Default message object
 
-                try {
-                    var fullNumber = iti.getNumber();
-                    if (fullNumber) {
-                        var msg = {
-                            valid: true,
-                            value: fullNumber // Retrieve the full phone number with the country code
-                        };
-                        console.log("Sending submit message:", msg);
-                    } else {
-                        console.error("Full phone number is null.");
+                if (iti.isValidNumber()) {
+                    console.log("Phone number is valid:", iti.isValidNumber());
+
+                    try {
+                        var fullNumber = iti.getNumber();
+                        if (fullNumber) {
+                            msg = {
+                                valid: true,
+                                value: fullNumber // Retrieve the full phone number with the country code
+                            };
+                            console.log("Sending submit message:", msg);
+                        } else {
+                            console.error("Full phone number is null.");
+                        }
+                    } catch (error) {
+                        console.error("Error sending submit message:", error);
                     }
-                } catch (error) {
-                    console.error("Error sending submit message:", error);
+
+                } else {
+                    console.log("Phone number is not valid.");
+                    // Display error message
+                    errorMsg.innerHTML = "Veuillez entrer un numéro de téléphone valide.";
                 }
-
-            } else {
-                console.log("Phone number is not valid.");
-                // Display error message
-                errorMsg.innerHTML = "Veuillez entrer un numéro de téléphone valide.";
-                // Mark the widget as invalid so the form does not submit
-                var msg = { valid: false, value: "" };
-            }
-            
-            JFCustomWidget.sendSubmit(msg);
-        });
-
+                
+                JFCustomWidget.sendSubmit(msg);
+            });
     </script>
 </body>
 
