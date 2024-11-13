@@ -7,7 +7,8 @@
             po.src = '//js.jotform.com/JotFormCustomWidget.min.js?onload=onLoadCallback';
             var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
         })();
-        // Ajout du script pour le plugin de sélection de pays et de format de téléphone
+
+        // Chargement du plugin de sélection de pays et formatage de numéro de téléphone
         var intlTelInputScript = document.createElement('script');
         intlTelInputScript.src = "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js";
         document.head.appendChild(intlTelInputScript);
@@ -22,7 +23,6 @@
     <div id="main">
         <div>
             <input type="tel" id="phoneInput" placeholder="Enter your phone number">
-            <div id="error-message" style="color: red; display: none;">Invalid phone number</div>
         </div>
     </div>
     
@@ -30,11 +30,10 @@
         // Configuration et initialisation du champ de numéro de téléphone avec le sélecteur de pays
         intlTelInputScript.onload = function() {
             const phoneInputField = document.querySelector("#phoneInput");
-            const errorMessage = document.querySelector("#error-message");
             const iti = window.intlTelInput(phoneInputField, {
                 initialCountry: "us",
                 utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
-                nationalMode: true,
+                nationalMode: false,
                 formatOnDisplay: true
             });
 
@@ -43,32 +42,33 @@
                 var label = JFCustomWidget.getWidgetSetting('QuestionLabel');
                 document.getElementById('labelText').innerHTML = label;
 
-                // Gestionnaire de soumission du formulaire pour valider et envoyer les informations de téléphone
+                // Validation de soumission du formulaire
                 JFCustomWidget.subscribe("submit", function() {
                     const phoneNumber = iti.getNumber();
                     const isValid = iti.isValidNumber();
 
-                    if (!isValid) {
-                        errorMessage.style.display = 'block';
-                    } else {
-                        errorMessage.style.display = 'none';
-                    }
-
+                    // Bloque la soumission si le numéro n'est pas valide
                     const msg = {
                         valid: isValid,
-                        value: isValid ? phoneNumber : "Invalid phone number"
+                        value: isValid ? phoneNumber : ""
                     };
                     JFCustomWidget.sendSubmit(msg);
                 });
             });
 
-            // Limiter la saisie en fonction de l'indicatif du pays
+            // Limite le nombre de chiffres selon le pays sélectionné
             phoneInputField.addEventListener('input', function() {
                 const countryData = iti.getSelectedCountryData();
-                const maxLength = countryData.dialCode.length + 10; // Adjust length based on country code
+                const maxLength = countryData.dialCode.length + 10; // Ajustez en fonction des besoins spécifiques
                 if (phoneInputField.value.length > maxLength) {
                     phoneInputField.value = phoneInputField.value.slice(0, maxLength);
                 }
+            });
+
+            // Change la limite en fonction de l'indicatif de pays
+            phoneInputField.addEventListener('countrychange', function() {
+                const countryData = iti.getSelectedCountryData();
+                phoneInputField.maxLength = countryData.dialCode.length + 10;
             });
         };
     </script>
