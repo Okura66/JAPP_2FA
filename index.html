@@ -1,67 +1,42 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <script type="text/javascript">
-        (function() {
-            var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
-            po.src = '//js.jotform.com/JotFormCustomWidget.min.js?onload=onLoadCallback';
-            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
-        })();
-
-        // Chargement du plugin de sélection de pays et formatage de numéro de téléphone
-        var intlTelInputScript = document.createElement('script');
-        intlTelInputScript.src = "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js";
-        document.head.appendChild(intlTelInputScript);
-
-        var intlTelInputCSS = document.createElement('link');
-        intlTelInputCSS.rel = "stylesheet";
-        intlTelInputCSS.href = "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.min.css";
-        document.head.appendChild(intlTelInputCSS);
-    </script>
+    <script src="//js.jotform.com/JotFormCustomWidget.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
 </head>
 <body>
     <div id="main">
-        <div>
-            <input type="tel" id="phoneInput" placeholder="Entrez votre numéro de téléphone">
-        </div>
+        <h3>Veuillez entrer votre numéro de téléphone</h3>
+        <input type="tel" id="phoneInput">
     </div>
-    
+
     <script type="text/javascript">
-        // Initialisation du champ de numéro de téléphone avec le sélecteur de pays
-        intlTelInputScript.onload = function() {
-            const phoneInputField = document.querySelector("#phoneInput");
-            const iti = window.intlTelInput(phoneInputField, {
+        JFCustomWidget.subscribe("ready", function(){
+            // Initialisation de intl-tel-input
+            var phoneInput = document.querySelector("#phoneInput");
+            var iti = window.intlTelInput(phoneInput, {
                 initialCountry: "fr",
-                nationalMode: true,
-                strictMode: true,
-                utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js" // pour formatage et validation
+                separateDialCode: true,
+                //onlyCountries: ["fr", "us", "gb", "de", "es"], // Ajouter les pays autorisés ici
+                utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js" // Utilisé pour la validation
             });
 
-            // Abonnement à l'événement "ready" de JotForm
-            JFCustomWidget.subscribe("ready", function() {
-                var label = JFCustomWidget.getWidgetSetting('QuestionLabel');
-                document.getElementById('labelText').innerHTML = label;
-
-                // Validation de soumission du formulaire
-                JFCustomWidget.subscribe("submit", function() {
-                    const phoneNumber = iti.getNumber();
-                    const isValid = iti.isValidNumber();
-
-                    // Bloque la soumission si le numéro n'est pas valide et affiche un message d'alerte
-                    if (!isValid) {
-                        alert("Le numéro de téléphone saisi n'est pas valide. Veuillez vérifier et réessayer.");
-                        JFCustomWidget.sendSubmit({ valid: false, value: "" });
-                        return;
-                    }
-
-                    // Envoi du résultat si le numéro est valide
-                    JFCustomWidget.sendSubmit({
+            // Validation lors de la soumission
+            JFCustomWidget.subscribe("submit", function(){
+                if (iti.isValidNumber()) {
+                    var msg = {
                         valid: true,
-                        value: phoneNumber
-                    });
-                });
+                        value: iti.getNumber() // Retourne le numéro complet avec indicatif du pays
+                    };
+                    JFCustomWidget.sendSubmit(msg);
+                } else {
+                    alert("Veuillez entrer un numéro de téléphone valide.");
+                    var msg = { valid: false };
+                    JFCustomWidget.sendSubmit(msg);
+                }
             });
-        };
+        });
     </script>
 </body>
 </html>
