@@ -18,13 +18,9 @@
             var iti = window.intlTelInput(phoneInput, {
                 initialCountry: "fr",
                 separateDialCode: true,
-                strictMode: true,
+                strictMode:true,
+                //onlyCountries: ["fr", "us", "gb", "de", "es"], // Ajouter les pays autorisés ici
                 utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js" // Utilisé pour la validation
-            });
-
-            // Efface le numéro lorsque le pays est changé
-            phoneInput.addEventListener("countrychange", function() {
-                phoneInput.value = ""; // Efface le champ de saisie
             });
 
             // Validation lors de la soumission
