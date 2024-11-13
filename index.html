@@ -79,6 +79,7 @@
                             valid: true,
                             value: fullNumber // Retrieve the full phone number with the country code
                         };
+                        console.log("Sending submit message:", msg);
                         JFCustomWidget.sendSubmit(msg);
                     } else {
                         console.error("Full phone number is null.");
