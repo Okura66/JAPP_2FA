@@ -5,11 +5,9 @@
     <script src="//js.jotform.com/JotFormCustomWidget.min.js"></script>
     
     <!-- Load intl-tel-input CSS for styling the phone input field -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css" />
-    
-    <!-- Load intl-tel-input JavaScript library for phone input functionality -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
-    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@24.7.0/build/css/intlTelInput.css">
+    <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@24.7.0/build/js/intlTelInput.min.js"></script>
+
     <!-- Custom CSS for error message styling and phone input field -->
     <style>
         .error-message {
@@ -41,12 +39,13 @@
         var errorMsg = document.querySelector("#errorMsg");
 
         var iti = window.intlTelInput(phoneInput, {
+            loadUtilsOnInit: "https://cdn.jsdelivr.net/npm/intl-tel-input@24.7.0/build/js/utils.js",
             initialCountry: "fr",
+            countrySearch: true,
             separateDialCode: true,
             fixDropdownWidth: true,
             strictMode: true,
             validationNumberType: "MOBILE",
-            utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js"
         });
 
         function resetError() {
@@ -71,7 +70,7 @@
                     JFCustomWidget.sendSubmit(msg);
                 } else {
                     // If the phone number is invalid, display an error message below the input field
-                    errorMsg.innerHTML = "Please enter a valid phone number.";
+                    errorMsg.innerHTML = "Veuillez entrer un numéro de téléphone valide.";
                     // Mark the widget as invalid so the form does not submit
                     var msg = { valid: false };
                     JFCustomWidget.sendSubmit(msg);
