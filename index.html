@@ -22,6 +22,9 @@
             height: 30px;
             border: 1px solid #d3d3d3;
         }
+        .iti__country-list {
+            width: 100% !important;
+        }
     </style>
 </head>
 <body>
@@ -33,46 +36,41 @@
     </div>
 
     <script type="text/javascript">
-        // Subscribe to the "ready" event to initialize the widget when it's fully loaded
         JFCustomWidget.subscribe("ready", function(){
-            // Select the phone input field
             var phoneInput = document.querySelector("#phoneInput");
-            // Select the error message div
             var errorMsg = document.querySelector("#errorMsg");
-
-            // Initialize intl-tel-input with desired settings
+    
             var iti = window.intlTelInput(phoneInput, {
-                initialCountry: "fr", // Set the default country to France
-                separateDialCode: true, // Display the country dial code separately from the phone number
+                initialCountry: "fr",
+                separateDialCode: true,
                 strictMode: true,
-                utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js" // Load additional utilities for validation
+                utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js"
             });
-
-            // Function to reset the error message
+    
             function resetError() {
                 errorMsg.innerHTML = "";
             }
-
-            // Add event listeners to reset error message on input change or focus
+    
             phoneInput.addEventListener('change', resetError);
             phoneInput.addEventListener('keyup', resetError);
             phoneInput.addEventListener('focus', resetError);
-
-            // Subscribe to the "submit" event to validate and send data when the form is submitted
+    
+            // Ajuster la hauteur de l'iframe après l'initialisation
+            setTimeout(function() {
+                JFCustomWidget.requestFrameResize({
+                    height: document.body.scrollHeight
+                });
+            }, 100);
+    
             JFCustomWidget.subscribe("submit", function(){
-                // Check if the entered phone number is valid according to the selected country
                 if (iti.isValidNumber()) {
-                    // If valid, create a message with the required attributes
                     var msg = {
-                        valid: true, // Set valid to true to pass JotForm's required validation
-                        value: iti.getNumber() // Retrieve the full phone number with the country code
+                        valid: true,
+                        value: iti.getNumber()
                     };
-                    // Send the valid phone number to JotForm
                     JFCustomWidget.sendSubmit(msg);
                 } else {
-                    // If the phone number is invalid, display an error message below the input field
                     errorMsg.innerHTML = "Veuillez entrer un numéro de téléphone valide.";
-                    // Mark the widget as invalid so the form does not submit
                     var msg = { valid: false };
                     JFCustomWidget.sendSubmit(msg);
                 }
