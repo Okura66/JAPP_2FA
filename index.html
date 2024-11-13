@@ -1,38 +1,74 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <!-- Load the JotForm Custom Widget API -->
     <script src="//js.jotform.com/JotFormCustomWidget.min.js"></script>
+    
+    <!-- Load intl-tel-input CSS for styling the phone input field -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css" />
+    
+    <!-- Load intl-tel-input JavaScript library for phone input functionality -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
+    
+    <!-- Custom CSS for error message styling -->
+    <style>
+        .error-message {
+            color: red;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+    </style>
 </head>
 <body>
     <div id="main">
-        <h3>Veuillez entrer votre numéro de téléphone</h3>
+        <h3>Please enter your phone number</h3>
+        <!-- The phone input field where users will enter their number -->
         <input type="tel" id="phoneInput">
+        <!-- Placeholder for displaying error messages -->
+        <div id="errorMsg" class="error-message"></div>
     </div>
 
     <script type="text/javascript">
+        // Subscribe to the "ready" event to initialize the widget when it's fully loaded
         JFCustomWidget.subscribe("ready", function(){
-            // Initialisation de intl-tel-input
+            // Select the phone input field
             var phoneInput = document.querySelector("#phoneInput");
+            // Select the error message div
+            var errorMsg = document.querySelector("#errorMsg");
+
+            // Initialize intl-tel-input with desired settings
             var iti = window.intlTelInput(phoneInput, {
-                initialCountry: "fr",
-                separateDialCode: true,
-                strictMode: true,
-                //onlyCountries: ["fr", "us", "gb", "de", "es"], // Ajouter les pays autorisés ici
-                utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js" // Utilisé pour la validation
+                initialCountry: "fr", // Set the default country to France
+                separateDialCode: true, // Display the country dial code separately from the phone number
+                onlyCountries: ["fr", "us", "gb", "de", "es"], // Restrict selectable countries
+                utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js" // Load additional utilities for validation
             });
 
-            // Validation lors de la soumission
+            // Function to reset the error message
+            function resetError() {
+                errorMsg.innerHTML = "";
+            }
+
+            // Add event listeners to reset error message on input change or focus
+            phoneInput.addEventListener('change', resetError);
+            phoneInput.addEventListener('keyup', resetError);
+            phoneInput.addEventListener('focus', resetError);
+
+            // Subscribe to the "submit" event to validate and send data when the form is submitted
             JFCustomWidget.subscribe("submit", function(){
+                // Check if the entered phone number is valid according to the selected country
                 if (iti.isValidNumber()) {
+                    // If valid, create a message with the required attributes
                     var msg = {
-                        valid: true,
-                        value: iti.getNumber() // Retourne le numéro complet avec indicatif du pays
+                        valid: true, // Set valid to true to pass JotForm's required validation
+                        value: iti.getNumber() // Retrieve the full phone number with the country code
                     };
+                    // Send the valid phone number to JotForm
                     JFCustomWidget.sendSubmit(msg);
                 } else {
-                    alert("Veuillez entrer un numéro de téléphone valide.");
+                    // If the phone number is invalid, display an error message below the input field
+                    errorMsg.innerHTML = "Please enter a valid phone number.";
+                    // Mark the widget as invalid so the form does not submit
                     var msg = { valid: false };
                     JFCustomWidget.sendSubmit(msg);
                 }
