@@ -22,60 +22,61 @@
             height: 30px;
             border: 1px solid #d3d3d3;
         }
-        .iti__country-list {
-            width: 100% !important;
-        }
     </style>
 </head>
 <body>
     <div id="main">
+        <h3>This is my first widget.</h3>
+        <span id="labelText"></span>
         <!-- The phone input field where users will enter their number -->
         <input type="tel" id="phoneInput">
         <!-- Placeholder for displaying error messages -->
         <div id="errorMsg" class="error-message"></div>
     </div>
 
-    <script type="text/javascript">
-        JFCustomWidget.subscribe("ready", function(){
-            var phoneInput = document.querySelector("#phoneInput");
-            var errorMsg = document.querySelector("#errorMsg");
-    
-            var iti = window.intlTelInput(phoneInput, {
-                initialCountry: "fr",
-                separateDialCode: true,
-                strictMode: true,
-                utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js"
-            });
-    
-            function resetError() {
-                errorMsg.innerHTML = "";
-            }
-    
-            phoneInput.addEventListener('change', resetError);
-            phoneInput.addEventListener('keyup', resetError);
-            phoneInput.addEventListener('focus', resetError);
-    
-            // Ajuster la hauteur de l'iframe après l'initialisation
-            setTimeout(function() {
-                JFCustomWidget.requestFrameResize({
-                    height: document.body.scrollHeight
-                });
-            }, 100);
-    
-            JFCustomWidget.subscribe("submit", function(){
-                if (iti.isValidNumber()) {
-                    var msg = {
-                        valid: true,
-                        value: iti.getNumber()
-                    };
-                    JFCustomWidget.sendSubmit(msg);
-                } else {
-                    errorMsg.innerHTML = "Veuillez entrer un numéro de téléphone valide.";
-                    var msg = { valid: false };
-                    JFCustomWidget.sendSubmit(msg);
-                }
-            });
+<script type="text/javascript">
+    JFCustomWidget.subscribe("ready", function(){
+        var WidgetLabel = JFCustomWidget.getWidgetSetting('WidgetLabel');
+        document.getElementById('WidgetLabel').innerHTML = WidgetLabel;
+        var phoneInput = document.querySelector("#phoneInput");
+        var errorMsg = document.querySelector("#errorMsg");
+
+        var iti = window.intlTelInput(phoneInput, {
+            initialCountry: "fr",
+            separateDialCode: true,
+            strictMode: true,
+            utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js"
         });
-    </script>
+
+        function resetError() {
+            errorMsg.innerHTML = "";
+        }
+
+        phoneInput.addEventListener('change', resetError);
+        phoneInput.addEventListener('keyup', resetError);
+        phoneInput.addEventListener('focus', resetError);
+
+        // Ajuster la hauteur de l'iframe après l'initialisation
+        setTimeout(function() {
+            JFCustomWidget.requestFrameResize({
+                height: document.body.scrollHeight
+            });
+        }, 100);
+
+        JFCustomWidget.subscribe("submit", function(){
+            if (iti.isValidNumber()) {
+                var msg = {
+                    valid: true,
+                    value: iti.getNumber()
+                };
+                JFCustomWidget.sendSubmit(msg);
+            } else {
+                errorMsg.innerHTML = "Veuillez entrer un numéro de téléphone valide.";
+                var msg = { valid: false };
+                JFCustomWidget.sendSubmit(msg);
+            }
+        });
+    });
+</script>
 </body>
 </html>
