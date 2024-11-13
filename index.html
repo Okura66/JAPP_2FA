@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script type="text/javascript">
+        (function() {
+            var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+            po.src = '//js.jotform.com/JotFormCustomWidget.min.js?onload=onLoadCallback';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+        })();
+        // Ajout du script pour le plugin de sélection de pays et de format de téléphone
+        var intlTelInputScript = document.createElement('script');
+        intlTelInputScript.src = "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js";
+        document.head.appendChild(intlTelInputScript);
+
+        var intlTelInputCSS = document.createElement('link');
+        intlTelInputCSS.rel = "stylesheet";
+        intlTelInputCSS.href = "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.min.css";
+        document.head.appendChild(intlTelInputCSS);
+    </script>
+</head>
+<body>
+    <div id="main">
+        <h3>Phone Number Entry with Country Selector</h3>
+        <div>
+            <input type="tel" id="phoneInput" placeholder="Enter your phone number">
+        </div>
+    </div>
+    
+    <script type="text/javascript">
+        // Configuration et initialisation du champ de numéro de téléphone avec le sélecteur de pays
+        intlTelInputScript.onload = function() {
+            const phoneInputField = document.querySelector("#phoneInput");
+            const iti = window.intlTelInput(phoneInputField, {
+                initialCountry: "us",
+                geoIpLookup: function(callback) {
+                    fetch('https://ipinfo.io/json?token=d8a254072a99d3') // Remplacez YOUR_TOKEN par votre jeton d'accès ipinfo.io
+                        .then(response => response.json())
+                        .then(data => callback(data.country))
+                        .catch(() => callback("fr"));
+                },
+                utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js"
+            });
+
+            // Gestionnaire de soumission du formulaire pour valider et envoyer les informations de téléphone
+            JFCustomWidget.subscribe("submit", function() {
+                const phoneNumber = iti.getNumber();
+                const isValid = iti.isValidNumber();
+
+                const msg = {
+                    valid: isValid,
+                    value: isValid ? phoneNumber : "Invalid phone number"
+                };
+                JFCustomWidget.sendSubmit(msg);
+            });
+        };
+
+        // Abonnement à l'événement "ready" de JotForm
+        JFCustomWidget.subscribe("ready", function() {
+            // Vous pouvez également définir d'autres paramètres si besoin
+        });
+    </script>
+</body>
+</html>
