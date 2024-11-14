@@ -86,23 +86,20 @@
 
             // Subscribe to the "submit" event to validate and send data when the form is submitted
             JFCustomWidget.subscribe("submit", function () {
+                var msg = { valid: true, value: "" }; // Initialize msg once
+
                 if (iti.isValidNumber()) {
                     console.log("Phone number is valid:", iti.isValidNumber());
 
                     try {
                         var fullNumber = iti.getNumber();
                         if (fullNumber) {
-                            var msg = {
-                                valid: true,
-                                value: fullNumber // Retrieve the full phone number with the country code
-                            };
-                            console.log("Sending submit message:", msg);
-                            JFCustomWidget.sendSubmit(msg);
+                            msg.value = fullNumber; // Set the full phone number with the country code
                         } else {
                             console.error("Full phone number is null.");
                         }
                     } catch (error) {
-                        console.error("Error sending submit message:", error);
+                        console.error("Error retrieving full phone number:", error);
                     }
 
                 } else {
@@ -110,9 +107,11 @@
                     // Display error message
                     errorMsg.innerHTML = "Veuillez entrer un numéro de téléphone valide.";
                     // Mark the widget as invalid so the form does not submit
-                    var msg = { valid: false, value: "" };
-                    JFCustomWidget.sendSubmit(msg);
+                    msg.valid = false;
                 }
+
+                console.log("Sending submit message:", msg);
+                JFCustomWidget.sendSubmit(msg); // Send the submit message once
             });
         });
     </script>
