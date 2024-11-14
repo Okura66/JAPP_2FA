@@ -77,7 +77,7 @@
 
             // Add event listener to resize iframe when the dropdown is opened
             phoneInput.addEventListener('open:countrydropdown', function () {
-                JFCustomWidget.requestFrameResize({ height: 320 }); // Adjust height as needed
+                JFCustomWidget.requestFrameResize({ height: 330 }); // Adjust height as needed
             });
 
             phoneInput.addEventListener('close:countrydropdown', function () {
@@ -110,8 +110,9 @@
                     msg.valid = false;
                 }
 
-                console.log("Sending submit message:", msg);
-                JFCustomWidget.sendSubmit(msg); // Send the submit message once
+                console.log("Before sending submit message:", msg);
+                JFCustomWidget.sendSubmit(msg);
+                console.log("After sending submit message.");
             });
         });
     </script>
