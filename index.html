@@ -15,7 +15,7 @@
     <!-- Custom CSS for error message styling and phone input field -->
     <style>
         /* Apply the Roboto font throughout the widget */
-        body, h3, .error-message {
+        * {
             font-family: 'Roboto', sans-serif !important;
         }
 
@@ -50,7 +50,9 @@
 
     <script type="text/javascript">
         JFCustomWidget.subscribe("ready", function () {
-            var label = JFCustomWidget.getWidgetSetting('WidgetLabel');
+            var settings = JFCustomWidget.getWidgetSettings();
+            console.debug("Widget Settings:", settings);
+            var label = settings.WidgetLabel;
             document.getElementById('labelText').innerHTML = label;
             var phoneInput = document.querySelector("#phoneInput");
             var errorMsg = document.querySelector("#errorMsg");
