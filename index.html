@@ -95,6 +95,7 @@
                         var fullNumber = iti.getNumber();
                         if (fullNumber) {
                             msg.value = fullNumber; // Set the full phone number with the country code
+                            JFCustomWidget.sendSubmit(msg);
                         } else {
                             console.error("Full phone number is null.");
                         }
