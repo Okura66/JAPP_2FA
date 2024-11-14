@@ -50,9 +50,8 @@
 
     <script type="text/javascript">
         JFCustomWidget.subscribe("ready", function () {
-            var settings = JFCustomWidget.getWidgetSettings();
-            console.debug("Widget Settings:", settings);
-            var label = settings.WidgetLabel;
+            console.log("Ready event triggered.");
+            var label = JFCustomWidget.getWidgetSetting('WidgetLabel');
             document.getElementById('labelText').innerHTML = label;
             var phoneInput = document.querySelector("#phoneInput");
             var errorMsg = document.querySelector("#errorMsg");
@@ -88,6 +87,7 @@
 
             // Subscribe to the "submit" event to validate and send data when the form is submitted
             JFCustomWidget.subscribe("submit", function () {
+                console.log("Submit event triggered.");
                 var msg = { valid: true, value: "" }; // Initialize msg once
 
                 if (iti.isValidNumber()) {
