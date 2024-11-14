@@ -49,74 +49,78 @@
     </div>
 
     <script type="text/javascript">
-        JFCustomWidget.subscribe("ready", function () {
-            console.log("Ready event triggered.");
-            var label = JFCustomWidget.getWidgetSetting('WidgetLabel');
-            document.getElementById('labelText').innerHTML = label;
-            var phoneInput = document.querySelector("#phoneInput");
-            var errorMsg = document.querySelector("#errorMsg");
+        // Ensure the ready event is only subscribed once
+        if (!window.jfWidgetReady) {
+            window.jfWidgetReady = true;
+            JFCustomWidget.subscribe("ready", function () {
+                console.log("Ready event triggered.");
+                var label = JFCustomWidget.getWidgetSetting('WidgetLabel');
+                document.getElementById('labelText').innerHTML = label;
+                var phoneInput = document.querySelector("#phoneInput");
+                var errorMsg = document.querySelector("#errorMsg");
 
-            var iti = window.intlTelInput(phoneInput, {
-                loadUtilsOnInit: "https://cdn.jsdelivr.net/npm/intl-tel-input@24.7.0/build/js/utils.js",
-                initialCountry: "fr",
-                useFullscreenPopup: false,
-                countrySearch: true,
-                fixDropdownWidth: true,
-                strictMode: true,
-                validationNumberType: "MOBILE",
-                dropdownContainer: document.body // Append the country dropdown to the body
-            });
+                var iti = window.intlTelInput(phoneInput, {
+                    loadUtilsOnInit: "https://cdn.jsdelivr.net/npm/intl-tel-input@24.7.0/build/js/utils.js",
+                    initialCountry: "fr",
+                    useFullscreenPopup: false,
+                    countrySearch: true,
+                    fixDropdownWidth: true,
+                    strictMode: true,
+                    validationNumberType: "MOBILE",
+                    dropdownContainer: document.body // Append the country dropdown to the body
+                });
 
-            function resetError() {
-                errorMsg.innerHTML = "";
-            }
-
-            // Add event listeners to reset error message on input change or focus
-            phoneInput.addEventListener('change', resetError);
-            phoneInput.addEventListener('keyup', resetError);
-            phoneInput.addEventListener('focus', resetError);
-
-            // Add event listener to resize iframe when the dropdown is opened
-            phoneInput.addEventListener('open:countrydropdown', function () {
-                JFCustomWidget.requestFrameResize({ height: 330 }); // Adjust height as needed
-            });
-
-            phoneInput.addEventListener('close:countrydropdown', function () {
-                JFCustomWidget.requestFrameResize({ height: 140 }); // Reset height to original or desired value
-            });
-
-            // Subscribe to the "submit" event to validate and send data when the form is submitted
-            JFCustomWidget.subscribe("submit", function () {
-                console.log("Submit event triggered.");
-                var msg = { valid: true, value: "" }; // Initialize msg once
-
-                if (iti.isValidNumber()) {
-                    console.log("Phone number is valid:", iti.isValidNumber());
-
-                    try {
-                        var fullNumber = iti.getNumber();
-                        if (fullNumber) {
-                            msg.value = fullNumber; // Set the full phone number with the country code
-                        } else {
-                            console.error("Full phone number is null.");
-                        }
-                    } catch (error) {
-                        console.error("Error retrieving full phone number:", error);
-                    }
-
-                } else {
-                    console.log("Phone number is not valid.");
-                    // Display error message
-                    errorMsg.innerHTML = "Veuillez entrer un numéro de téléphone valide.";
-                    // Mark the widget as invalid so the form does not submit
-                    msg.valid = false;
+                function resetError() {
+                    errorMsg.innerHTML = "";
                 }
 
-                console.log("Before sending submit message:", msg);
-                JFCustomWidget.sendSubmit(msg);
-                console.log("After sending submit message.");
+                // Add event listeners to reset error message on input change or focus
+                phoneInput.addEventListener('change', resetError);
+                phoneInput.addEventListener('keyup', resetError);
+                phoneInput.addEventListener('focus', resetError);
+
+                // Add event listener to resize iframe when the dropdown is opened
+                phoneInput.addEventListener('open:countrydropdown', function () {
+                    JFCustomWidget.requestFrameResize({ height: 330 }); // Adjust height as needed
+                });
+
+                phoneInput.addEventListener('close:countrydropdown', function () {
+                    JFCustomWidget.requestFrameResize({ height: 140 }); // Reset height to original or desired value
+                });
+
+                // Subscribe to the "submit" event to validate and send data when the form is submitted
+                JFCustomWidget.subscribe("submit", function () {
+                    console.log("Submit event triggered.");
+                    var msg = { valid: true, value: "" }; // Initialize msg once
+
+                    if (iti.isValidNumber()) {
+                        console.log("Phone number is valid:", iti.isValidNumber());
+
+                        try {
+                            var fullNumber = iti.getNumber();
+                            if (fullNumber) {
+                                msg.value = fullNumber; // Set the full phone number with the country code
+                            } else {
+                                console.error("Full phone number is null.");
+                            }
+                        } catch (error) {
+                            console.error("Error retrieving full phone number:", error);
+                        }
+
+                    } else {
+                        console.log("Phone number is not valid.");
+                        // Display error message
+                        errorMsg.innerHTML = "Veuillez entrer un numéro de téléphone valide.";
+                        // Mark the widget as invalid so the form does not submit
+                        msg.valid = false;
+                    }
+
+                    console.log("Before sending submit message:", msg);
+                    JFCustomWidget.sendSubmit(msg);
+                    console.log("After sending submit message.");
+                });
             });
-        });
+        }
     </script>
 </body>
 
