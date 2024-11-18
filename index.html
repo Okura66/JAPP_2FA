@@ -42,30 +42,15 @@
         <input type="tel" id="phoneInput">
         <!-- Placeholder for displaying error messages -->
         <div id="errorMsg" class="error-message"></div>
-        <p id="versionText">Version 0.0.120</p>
+        <p id="versionText">Version 0.0.121</p>
     </div>
 
     <script type="module">
         // Subscribe to the "ready" event to initialize the widget
 
         console.log("Navigator language:", navigator.language || navigator.userLanguage);
-        const language = (navigator.language || navigator.userLanguage).split('-')[0];
-        const langCode = language.slice(0, 2);
-
-        async function loadTranslations(langCode) {
-            try {
-                const module = await import(`https://cdn.jsdelivr.net/npm/intl-tel-input@24.7.0/build/js/i18n/${langCode}/index.js`);
-                return module.default;
-            } catch (error) {
-                console.error(`Failed to load translations for ${langCode}, defaulting to 'en'.`, error);
-                const module = await import('https://cdn.jsdelivr.net/npm/intl-tel-input@24.7.0/build/js/i18n/en/index.js');
-                return module.default;
-            }
-        }
-
-        loadTranslations(langCode).then(allTranslations => {
-            console.log(allTranslations);
-        });
+        import { default as allTranslations } from 'https://cdn.jsdelivr.net/npm/intl-tel-input@24.7.0/build/js/i18n/fr/index.js';
+        console.log(allTranslations);
 
         JFCustomWidget.subscribe("ready", function () {
             console.log("Ready event triggered.");
@@ -93,7 +78,7 @@
                 strictMode: true,
                 validationNumberType: "MOBILE",
                 dropdownContainer: document.body, // Append the country dropdown to the body
-                i18n: module
+                i18n: allTranslations
             });
 
             // Function to reset the error message
