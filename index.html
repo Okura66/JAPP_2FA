@@ -64,7 +64,7 @@
             var countrySearch = JFCustomWidget.getWidgetSetting('CountrySearch') || "true";
             var customErrorMessage = JFCustomWidget.getWidgetSetting('ErrorMessage') || "Veuillez entrer un numéro de téléphone valide.";
 
-            console.log('allTranslations:', allTranslations);
+            console.log('allTranslations:', window.allTranslations);
             
             // Initialize the intl-tel-input plugin with settings
             var iti = window.intlTelInput(phoneInput, {
