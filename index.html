@@ -2,9 +2,6 @@
 <html>
 
 <head>
-    <!-- Load the Roboto font from Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-
     <!-- Load the JotForm Custom Widget API -->
     <script src="//js.jotform.com/JotFormCustomWidget.min.js"></script>
 
@@ -14,22 +11,21 @@
 
     <!-- Custom CSS for error message styling and phone input field -->
     <style>
-        /* Apply the Roboto font throughout the widget */
-        * {
-            font-family: 'Roboto', sans-serif !important;
-        }
-
+        /* Style for error messages */
         .error-message {
             color: red;
             font-size: 0.9em;
             margin-top: 5px;
         }
 
+        /* Style for the phone input field */
         #phoneInput {
             width: 100%;
             height: 40px;
             border: 1px solid #d3d3d3;
         }
+
+        /* Style for the search input in the country dropdown */
         .iti__search-input {
             width: 100%;
             border-width: 0;
@@ -41,105 +37,115 @@
 
 <body>
     <div id="main">
-        <h3 id="labelText">This is my first widget.</h3>
+        <h3 id="labelText">Votre numéro ?</h3>
         <!-- The phone input field where users will enter their number -->
         <input type="tel" id="phoneInput">
         <!-- Placeholder for displaying error messages -->
         <div id="errorMsg" class="error-message"></div>
-        <p id="versionText">Version 0.0.8</p>
+        <p id="versionText">Version 0.0.9</p>
     </div>
 
     <script type="text/javascript">
+        
+        function loadI18nModule(countryCode) {
+            return new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = `https://cdn.jsdelivr.net/npm/intl-tel-input@24.7.0/build/js/i18n/${countryCode}/index.js`;
+                script.onload = resolve;
+                script.onerror = () => reject(new Error(`Failed to load i18n module for ${countryCode}`));
+                document.head.appendChild(script);
+            });
+        }
+        
         JFCustomWidget.subscribe("ready", function () {
             console.log("Ready event triggered.");
+
+            // Get the widget label setting and update the label text
             var label = JFCustomWidget.getWidgetSetting('WidgetLabel');
             document.getElementById('labelText').innerHTML = label;
-            var phoneInput = document.querySelector("#phoneInput");
-            var errorMsg = document.querySelector("#errorMsg");
 
+            // Get initial settings for the phone input
             var initialCountry = JFCustomWidget.getWidgetSetting('InitialCountry') || "fr";
             var countrySearch = JFCustomWidget.getWidgetSetting('CountrySearch') || "true";
             var customErrorMessage = JFCustomWidget.getWidgetSetting('ErrorMessage') || "Veuillez entrer un numéro de téléphone valide.";
 
-            var iti = window.intlTelInput(phoneInput, {
-                loadUtilsOnInit: "https://cdn.jsdelivr.net/npm/intl-tel-input@24.7.0/build/js/utils.js",
-                initialCountry: initialCountry,
-                useFullscreenPopup: false,
-                countrySearch: countrySearch,
-                fixDropdownWidth: true,
-                strictMode: true,
-                validationNumberType: "MOBILE",
-                dropdownContainer: document.body // Append the country dropdown to the body
-            });
+            // Dynamically load the i18n module for the selected country
+            loadI18nModule(initialCountry)
+                .then(() => {
+                    console.log(`i18n module for ${initialCountry} loaded successfully.`);
 
-            function resetError() {
-                errorMsg.innerHTML = "";
-            }
+                    // Select the phone input and error message elements
+                    var phoneInput = document.querySelector("#phoneInput");
+                    var errorMsg = document.querySelector("#errorMsg");
 
-            // Add event listeners to reset error message on input change or focus
-            phoneInput.addEventListener('change', resetError);
-            phoneInput.addEventListener('keyup', resetError);
-            phoneInput.addEventListener('focus', resetError);
+                    // Initialize the intl-tel-input plugin with settings
+                    var iti = window.intlTelInput(phoneInput, {
+                        loadUtilsOnInit: "https://cdn.jsdelivr.net/npm/intl-tel-input@24.7.0/build/js/utils.js",
+                        initialCountry: initialCountry,
+                        useFullscreenPopup: false,
+                        countrySearch: countrySearch,
+                        fixDropdownWidth: true,
+                        strictMode: true,
+                        validationNumberType: "MOBILE",
+                        dropdownContainer: document.body // Append the country dropdown to the body
+                    });
 
-            // Add event listener to resize iframe when the dropdown is opened
-            phoneInput.addEventListener('open:countrydropdown', function () {
-                JFCustomWidget.requestFrameResize({ height: 330 }); // Adjust height as needed
-            });
-
-            phoneInput.addEventListener('close:countrydropdown', function () {
-                JFCustomWidget.requestFrameResize({ height: 140 }); // Reset height to original or desired value
-            });
-
-            // Add event listener to send data as soon as it is valid
-            phoneInput.addEventListener('input', function () {
-                if (iti.isValidNumber()) {
-                    try {
-                        var fullNumber = iti.getNumber();
-                        if (fullNumber) {
-                            JFCustomWidget.sendData({
-                                valid: true,
-                                value: fullNumber
-                            });
-                            console.log("Data sent:", fullNumber);
-                        }
-                    } catch (error) {
-                        console.error("Error retrieving full phone number:", error);
+                    // Add the rest of your event listeners and logic here
+                    function resetError() {
+                        errorMsg.innerHTML = "";
                     }
-                }
-            });
 
-            // Subscribe to the "submit" event to validate and send data when the form is submitted
-            JFCustomWidget.subscribe("submit", function () {
-                console.log("Submit event triggered.");
-                var msg = { valid: true, value: "" }; // Initialize msg once
+                    phoneInput.addEventListener('change', resetError);
+                    phoneInput.addEventListener('keyup', resetError);
+                    phoneInput.addEventListener('focus', resetError);
 
-                if (iti.isValidNumber()) {
-                    console.log("Phone number is valid:", iti.isValidNumber());
+                    // Send data when the input is valid
+                    phoneInput.addEventListener('input', function () {
+                        if (iti.isValidNumber()) {
+                            try {
+                                var fullNumber = iti.getNumber();
+                                if (fullNumber) {
+                                    JFCustomWidget.sendData({
+                                        valid: true,
+                                        value: fullNumber
+                                    });
+                                    console.log("Data sent:", fullNumber);
+                                }
+                            } catch (error) {
+                                console.error("Error retrieving full phone number:", error);
+                            }
+                        }
+                    });
 
-                    try {
-                        var fullNumber = iti.getNumber();
-                        if (fullNumber) {
-                            msg.value = fullNumber; // Set the full phone number with the country code
+                    // Validation logic on submit
+                    JFCustomWidget.subscribe("submit", function () {
+                        console.log("Submit event triggered.");
+                        var msg = { valid: true, value: "" };
+
+                        if (iti.isValidNumber()) {
+                            try {
+                                var fullNumber = iti.getNumber();
+                                if (fullNumber) {
+                                    msg.value = fullNumber;
+                                } else {
+                                    console.error("Full phone number is null.");
+                                }
+                            } catch (error) {
+                                console.error("Error retrieving full phone number:", error);
+                            }
                         } else {
-                            console.error("Full phone number is null.");
+                            errorMsg.innerHTML = customErrorMessage;
+                            msg.valid = false;
                         }
-                    } catch (error) {
-                        console.error("Error retrieving full phone number:", error);
-                    }
 
-                } else {
-                    console.log("Phone number is not valid.");
-                    // Display error message
-                    errorMsg.innerHTML = customErrorMessage;
-                    // Mark the widget as invalid so the form does not submit
-                    msg.valid = false;
-                }
-
-                console.log("Before sending submit message:", msg);
-                JFCustomWidget.sendSubmit(msg);
-                console.log("After sending submit message.");
-            });
+                        JFCustomWidget.sendSubmit(msg);
+                    });
+                })
+                .catch(error => {
+                    console.error("Error loading i18n module:", error);
+                });
         });
+
     </script>
 </body>
 
