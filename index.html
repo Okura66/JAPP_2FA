@@ -42,27 +42,16 @@
         <input type="tel" id="phoneInput">
         <!-- Placeholder for displaying error messages -->
         <div id="errorMsg" class="error-message"></div>
-        <p id="versionText">Version 0.0.125</p>
+        <p id="versionText">Version 0.0.126</p>
     </div>
 
     <script type="module">
         // Subscribe to the "ready" event to initialize the widget
 
-        let i18n;
-
-        (async () => {
-            i18n = await import('./i18n.js');
-            console.log(i18n);
-        })();
+        const i18n = await import('./i18n.js');
 
         JFCustomWidget.subscribe("ready", async function () {
             console.log("Ready event triggered.");
-
-            // Ensure i18n is loaded before proceeding
-            if (!i18n || !i18n.fr) {
-                console.error("i18n or i18n.fr is undefined.");
-                return;
-            }
 
             // Get the widget label setting and update the label text
             var label = JFCustomWidget.getWidgetSetting('WidgetLabel');
