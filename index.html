@@ -48,8 +48,7 @@
     <script type="module">
         // Subscribe to the "ready" event to initialize the widget
 
-        import { default as allTranslations } from 'https://cdn.jsdelivr.net/npm/intl-tel-input@24.7.0/build/js/i18n/fr/index.js';
-        console.log(allTranslations);
+        import * as i18n from 'https://cdn.jsdelivr.net/npm/intl-tel-input@24.7.0/build/js/i18n/index.js';
 
         JFCustomWidget.subscribe("ready", function () {
             console.log("Ready event triggered.");
@@ -77,7 +76,7 @@
                 strictMode: true,
                 validationNumberType: "MOBILE",
                 dropdownContainer: document.body, // Append the country dropdown to the body
-                i18n: allTranslations
+                i18n: i18n.fr
             });
 
             // Function to reset the error message
