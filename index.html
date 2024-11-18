@@ -47,6 +47,10 @@
 
     <script type="module">
         // Subscribe to the "ready" event to initialize the widget
+
+        import { default as allTranslations } from 'https://cdn.jsdelivr.net/npm/intl-tel-input@24.7.0/build/js/i18n/fr/index.js';
+        console.log(allTranslations);
+
         JFCustomWidget.subscribe("ready", function () {
             console.log("Ready event triggered.");
 
