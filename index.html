@@ -8,6 +8,7 @@
     <!-- Load intl-tel-input CSS for styling the phone input field -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@24.7.0/build/css/intlTelInput.css">
     <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@24.7.0/build/js/intlTelInput.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@24.7.0/build/js/i18n/fr/index.js"></script>
 
     <!-- Custom CSS for error message styling and phone input field -->
     <style>
@@ -42,7 +43,7 @@
         <input type="tel" id="phoneInput">
         <!-- Placeholder for displaying error messages -->
         <div id="errorMsg" class="error-message"></div>
-        <p id="versionText">Version 0.1.0</p>
+        <p id="versionText">Version 0.1.1</p>
     </div>
 
     <script type="text/javascript">
@@ -63,26 +64,7 @@
             var countrySearch = JFCustomWidget.getWidgetSetting('CountrySearch') || "true";
             var customErrorMessage = JFCustomWidget.getWidgetSetting('ErrorMessage') || "Veuillez entrer un numéro de téléphone valide.";
 
-            fetch("https://cdn.jsdelivr.net/npm/intl-tel-input@24.7.0/build/js/i18n/fr/index.js")
-                .then(response => response.text())
-                .then(data => {
-                    // Create a new function to evaluate the module code
-                    const moduleFunction = new Function('exports', 'require', 'module', '__filename', '__dirname', data);
-                    
-                    // Create a mock module object
-                    const module = { exports: {} };
-                    
-                    // Execute the module function to populate module.exports
-                    moduleFunction(module.exports, null, module, null, null);
-                    
-                    // Access the allTranslations variable from module.exports
-                    const allTranslations = module.exports.default;
-                    
-                    console.log(allTranslations);
-                })
-                .catch(error => console.error('Error loading translations:', error));
-
-
+            console.log('allTranslations:', allTranslations);
             
             // Initialize the intl-tel-input plugin with settings
             var iti = window.intlTelInput(phoneInput, {
