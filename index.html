@@ -62,9 +62,10 @@
             var errorMsg = document.querySelector("#errorMsg");
 
             // Get initial settings for the phone input
-            var initialCountry = JFCustomWidget.getWidgetSetting('InitialCountry') || "fr";
+            var initialCountry = JFCustomWidget.getWidgetSetting('InitialCountry') || "en";
             var countrySearch = JFCustomWidget.getWidgetSetting('CountrySearch') || "true";
-            var customErrorMessage = JFCustomWidget.getWidgetSetting('ErrorMessage') || "Veuillez entrer un numéro de téléphone valide.";
+            var customErrorMessage = JFCustomWidget.getWidgetSetting('ErrorMessage') || "Please enter a valid phone number.";
+            var language = JFCustomWidget.getWidgetSetting('Language') || "en";
 
             // Initialize the intl-tel-input plugin with settings
             var iti = window.intlTelInput(phoneInput, {
@@ -74,9 +75,10 @@
                 countrySearch: countrySearch,
                 fixDropdownWidth: true,
                 strictMode: true,
+                countryOrder: [fr, be, ch],
                 validationNumberType: "MOBILE",
                 dropdownContainer: document.body, // Append the country dropdown to the body
-                i18n: i18n[initialCountry] || i18n['en']
+                i18n: i18n[language] || i18n['en']
             });
 
             // Function to reset the error message
