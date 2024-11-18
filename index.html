@@ -49,7 +49,8 @@
         // Subscribe to the "ready" event to initialize the widget
 
         const i18n = await import('./i18n.js');
-
+        console.log(i18n);
+        
         JFCustomWidget.subscribe("ready", async function () {
             console.log("Ready event triggered.");
 
