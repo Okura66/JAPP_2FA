@@ -1,31 +1,23 @@
 <!DOCTYPE html>
 <html>
-
 <head>
-    <!-- Load the JotForm Custom Widget API -->
     <script src="https://js.jotform.com/JotFormCustomWidget.min.js"></script>
-
-    <!-- Load intl-tel-input CSS for styling the phone input field -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@24.7.0/build/css/intlTelInput.css">
     <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@24.7.0/build/js/intlTelInput.min.js"></script>
 
-    <!-- Custom CSS for error message styling and phone input field -->
     <style>
-        /* Style for error messages */
         .error-message {
             color: red;
             font-size: 0.9em;
             margin-top: 5px;
         }
 
-        /* Style for the phone input field */
         #phoneInput {
             width: 100%;
             height: 40px;
             border: 1px solid #d3d3d3;
         }
 
-        /* Style for the search input in the country dropdown */
         .iti__search-input {
             width: 100%;
             border-width: 0;
@@ -38,115 +30,131 @@
 <body>
     <div id="main">
         <h3 id="labelText">Numéro de téléphone</h3>
-        <!-- The phone input field where users will enter their number -->
         <input type="tel" id="phoneInput">
-        <!-- Placeholder for displaying error messages -->
         <div id="errorMsg" class="error-message"></div>
         <p id="versionText">Version 0.1.0</p>
     </div>
 
     <script type="text/javascript">
-        // Subscribe to the "ready" event to initialize the widget
-        JFCustomWidget.subscribe("ready", function () {
-            console.log("Ready event triggered.");
+        // Fonction pour charger les traductions
+        async function loadTranslations() {
+            try {
+                const [countriesResponse, interfaceResponse] = await Promise.all([
+                    fetch('https://cdn.jsdelivr.net/npm/intl-tel-input@24.7.0/build/js/i18n/fr/countries.js'),
+                    fetch('https://cdn.jsdelivr.net/npm/intl-tel-input@24.7.0/build/js/i18n/fr/interface.js')
+                ]);
 
-            // Get the widget label setting and update the label text
-            var label = JFCustomWidget.getWidgetSetting('WidgetLabel');
-            document.getElementById('labelText').innerHTML = label;
+                const countriesText = await countriesResponse.text();
+                const interfaceText = await interfaceResponse.text();
 
-            // Select the phone input and error message elements
-            var phoneInput = document.querySelector("#phoneInput");
-            var errorMsg = document.querySelector("#errorMsg");
+                // Extraire le contenu des objets des fichiers JS
+                const countriesMatch = countriesText.match(/export default ({[\s\S]*});/);
+                const interfaceMatch = interfaceText.match(/export default ({[\s\S]*});/);
 
-            // Get initial settings for the phone input
-            var initialCountry = JFCustomWidget.getWidgetSetting('InitialCountry') || "fr";
-            var countrySearch = JFCustomWidget.getWidgetSetting('CountrySearch') || "true";
-            var customErrorMessage = JFCustomWidget.getWidgetSetting('ErrorMessage') || "Veuillez entrer un numéro de téléphone valide.";
+                if (!countriesMatch || !interfaceMatch) {
+                    throw new Error("Format de traduction inattendu");
+                }
 
-            // Initialize the intl-tel-input plugin with settings
-            var iti = window.intlTelInput(phoneInput, {
-                loadUtilsOnInit: "https://cdn.jsdelivr.net/npm/intl-tel-input@24.7.0/build/js/utils.js",
-                initialCountry: initialCountry,
-                useFullscreenPopup: false,
-                countrySearch: countrySearch,
-                fixDropdownWidth: true,
-                strictMode: true,
-                i18n: "https://cdn.jsdelivr.net/npm/intl-tel-input@24.7.0/build/js/i18n/fr/index.js",
-                validationNumberType: "MOBILE",
-                dropdownContainer: document.body // Append the country dropdown to the body
-            });
+                // Évaluer les objets de traduction de manière sécurisée
+                const countryTranslations = Function(`return ${countriesMatch[1]}`)();
+                const interfaceTranslations = Function(`return ${interfaceMatch[1]}`)();
 
-            // Function to reset the error message
-            function resetError() {
-                errorMsg.innerHTML = "";
+                // Combiner les traductions
+                return { ...countryTranslations, ...interfaceTranslations };
+            } catch (error) {
+                console.error("Erreur lors du chargement des traductions:", error);
+                // Retourner un objet de traduction minimal en cas d'erreur
+                return {
+                    selectedCountryAriaLabel: "Pays sélectionné",
+                    searchPlaceholder: "Rechercher un pays",
+                    // ... autres traductions par défaut si nécessaire
+                };
             }
+        }
 
-            // Add event listeners to reset error message on input change or focus
-            phoneInput.addEventListener('change', resetError);
-            phoneInput.addEventListener('keyup', resetError);
-            phoneInput.addEventListener('focus', resetError);
+        // Initialiser le widget une fois les traductions chargées
+        async function initializeWidget() {
+            const translations = await loadTranslations();
+            
+            JFCustomWidget.subscribe("ready", function () {
+                var label = JFCustomWidget.getWidgetSetting('WidgetLabel');
+                document.getElementById('labelText').innerHTML = label;
 
-            // Add event listener to resize iframe when the dropdown is opened
-            phoneInput.addEventListener('open:countrydropdown', function () {
-                JFCustomWidget.requestFrameResize({ height: 330 }); // Adjust height as needed
-            });
+                var phoneInput = document.querySelector("#phoneInput");
+                var errorMsg = document.querySelector("#errorMsg");
 
-            // Add event listener to resize iframe when the dropdown is closed
-            phoneInput.addEventListener('close:countrydropdown', function () {
-                JFCustomWidget.requestFrameResize({ height: 140 }); // Reset height to original or desired value
-            });
+                var initialCountry = JFCustomWidget.getWidgetSetting('InitialCountry') || "fr";
+                var countrySearch = JFCustomWidget.getWidgetSetting('CountrySearch') || "true";
+                var customErrorMessage = JFCustomWidget.getWidgetSetting('ErrorMessage') || "Veuillez entrer un numéro de téléphone valide.";
 
-            // Add event listener to send data as soon as it is valid
-            phoneInput.addEventListener('input', function () {
-                if (iti.isValidNumber()) {
-                    try {
-                        var fullNumber = iti.getNumber();
-                        if (fullNumber) {
-                            JFCustomWidget.sendData({
-                                valid: true,
-                                value: fullNumber
-                            });
-                            console.log("Data sent:", fullNumber);
-                        }
-                    } catch (error) {
-                        console.error("Error retrieving full phone number:", error);
-                    }
-                }
-            });
+                var iti = window.intlTelInput(phoneInput, {
+                    loadUtilsOnInit: "https://cdn.jsdelivr.net/npm/intl-tel-input@24.7.0/build/js/utils.js",
+                    initialCountry: initialCountry,
+                    useFullscreenPopup: false,
+                    countrySearch: countrySearch,
+                    fixDropdownWidth: true,
+                    strictMode: true,
+                    i18n: translations,  // Utilisation des traductions chargées
+                    validationNumberType: "MOBILE",
+                    dropdownContainer: document.body
+                });
 
-            // Subscribe to the "submit" event to validate and send data when the form is submitted
-            JFCustomWidget.subscribe("submit", function () {
-                console.log("Submit event triggered.");
-                var msg = { valid: true, value: "" }; // Initialize msg once
-
-                if (iti.isValidNumber()) {
-                    console.log("Phone number is valid:", iti.isValidNumber());
-
-                    try {
-                        var fullNumber = iti.getNumber();
-                        if (fullNumber) {
-                            msg.value = fullNumber; // Set the full phone number with the country code
-                        } else {
-                            console.error("Full phone number is null.");
-                        }
-                    } catch (error) {
-                        console.error("Error retrieving full phone number:", error);
-                    }
-
-                } else {
-                    console.log("Phone number is not valid.");
-                    // Display error message
-                    errorMsg.innerHTML = customErrorMessage;
-                    // Mark the widget as invalid so the form does not submit
-                    msg.valid = false;
+                function resetError() {
+                    errorMsg.innerHTML = "";
                 }
 
-                console.log("Before sending submit message:", msg);
-                JFCustomWidget.sendSubmit(msg);
-                console.log("After sending submit message.");
+                phoneInput.addEventListener('change', resetError);
+                phoneInput.addEventListener('keyup', resetError);
+                phoneInput.addEventListener('focus', resetError);
+
+                phoneInput.addEventListener('open:countrydropdown', function () {
+                    JFCustomWidget.requestFrameResize({ height: 330 });
+                });
+
+                phoneInput.addEventListener('close:countrydropdown', function () {
+                    JFCustomWidget.requestFrameResize({ height: 140 });
+                });
+
+                phoneInput.addEventListener('input', function () {
+                    if (iti.isValidNumber()) {
+                        try {
+                            var fullNumber = iti.getNumber();
+                            if (fullNumber) {
+                                JFCustomWidget.sendData({
+                                    valid: true,
+                                    value: fullNumber
+                                });
+                            }
+                        } catch (error) {
+                            console.error("Error retrieving full phone number:", error);
+                        }
+                    }
+                });
+
+                JFCustomWidget.subscribe("submit", function () {
+                    var msg = { valid: true, value: "" };
+
+                    if (iti.isValidNumber()) {
+                        try {
+                            var fullNumber = iti.getNumber();
+                            if (fullNumber) {
+                                msg.value = fullNumber;
+                            }
+                        } catch (error) {
+                            console.error("Error retrieving full phone number:", error);
+                        }
+                    } else {
+                        errorMsg.innerHTML = customErrorMessage;
+                        msg.valid = false;
+                    }
+
+                    JFCustomWidget.sendSubmit(msg);
+                });
             });
-        });
+        }
+
+        // Démarrer l'initialisation
+        initializeWidget();
     </script>
 </body>
-
 </html>
