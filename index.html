@@ -62,15 +62,15 @@
             var errorMsg = document.querySelector("#errorMsg");
 
             // Get initial settings for the phone input
-            var initialCountry = JFCustomWidget.getWidgetSetting('InitialCountry') || "en";
+            var initialCountry = JFCustomWidget.getWidgetSetting('InitialCountry') ?? "en";
             console.log("Initial Country:", initialCountry);
-            var countrySearch = JFCustomWidget.getWidgetSetting('CountrySearch') || "true";
+            var countrySearch = JFCustomWidget.getWidgetSetting('CountrySearch') ?? "true";
             console.log("Country Search Enabled:", countrySearch);
-            var customErrorMessage = JFCustomWidget.getWidgetSetting('ErrorMessage') || "Please enter a valid phone number.";
+            var customErrorMessage = JFCustomWidget.getWidgetSetting('ErrorMessage') ?? "Please enter a valid phone number.";
             console.log("Custom Error Message:", customErrorMessage);
-            var language = JFCustomWidget.getWidgetSetting('Language') || "en";
+            var language = JFCustomWidget.getWidgetSetting('Language') ?? "en";
             console.log("Language:", language);
-            var countryOrder = JFCustomWidget.getWidgetSetting('CountryOrder') || null;
+            var countryOrder = JFCustomWidget.getWidgetSetting('CountryOrder') ?? null;
             console.log("Country Order:", countryOrder);
 
             // Initialize the intl-tel-input plugin with settings
