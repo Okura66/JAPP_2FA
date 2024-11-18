@@ -42,17 +42,18 @@
         <input type="tel" id="phoneInput">
         <!-- Placeholder for displaying error messages -->
         <div id="errorMsg" class="error-message"></div>
-        <p id="versionText">Version 0.0.123</p>
+        <p id="versionText">Version 0.0.124</p>
     </div>
 
     <script type="module">
         // Subscribe to the "ready" event to initialize the widget
 
+        let i18n;
+
         (async () => {
-            const i18n = await import('./i18n.js');
+            i18n = await import('./i18n.js');
             console.log(i18n);
         })();
-
 
         JFCustomWidget.subscribe("ready", function () {
             console.log("Ready event triggered.");
