@@ -49,8 +49,53 @@
         // Subscribe to the "ready" event to initialize the widget
 
         console.log("Navigator language:", navigator.language || navigator.userLanguage);
-        import { default as allTranslations } from 'https://cdn.jsdelivr.net/npm/intl-tel-input@24.7.0/build/js/i18n/fr/index.js';
-        console.log(allTranslations);
+        import { 
+            ar, bg, bn, bs, ca, cs, da, de, el, en, es, fa, fi, fr, hi, hr, 
+            hu, id, it, ja, ko, mr, nl, no, pl, pt, ro, ru, sk, sv, te, th, 
+            tr, ur, vi, zh 
+          } from 'https://cdn.jsdelivr.net/npm/intl-tel-input@24.7.0/build/js/i18n/index.js';
+          
+          const languages = {
+            ar,
+            bg,
+            bn,
+            bs,
+            ca,
+            cs,
+            da,
+            de,
+            el,
+            en,
+            es,
+            fa,
+            fi,
+            fr,
+            hi,
+            hr,
+            hu,
+            id,
+            it,
+            ja,
+            ko,
+            mr,
+            nl,
+            no,
+            pl,
+            pt,
+            ro,
+            ru,
+            sk,
+            sv,
+            te,
+            th,
+            tr,
+            ur,
+            vi,
+            zh,
+          };
+          
+          // Utilisation exemple
+          console.log(languages.fr); // Traduction française
 
         JFCustomWidget.subscribe("ready", function () {
             console.log("Ready event triggered.");
