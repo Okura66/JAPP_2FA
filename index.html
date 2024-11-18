@@ -8,7 +8,6 @@
     <!-- Load intl-tel-input CSS for styling the phone input field -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@24.7.0/build/css/intlTelInput.css">
     <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@24.7.0/build/js/intlTelInput.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@24.7.0/build/js/i18n/fr/index.js"></script>
 
     <!-- Custom CSS for error message styling and phone input field -->
     <style>
@@ -46,7 +45,7 @@
         <p id="versionText">Version 0.1.1</p>
     </div>
 
-    <script type="text/javascript">
+    <script type="module">
         // Subscribe to the "ready" event to initialize the widget
         JFCustomWidget.subscribe("ready", function () {
             console.log("Ready event triggered.");
@@ -64,9 +63,6 @@
             var countrySearch = JFCustomWidget.getWidgetSetting('CountrySearch') || "true";
             var customErrorMessage = JFCustomWidget.getWidgetSetting('ErrorMessage') || "Veuillez entrer un numéro de téléphone valide.";
 
-            window.allTranslations = allTranslations;
-            console.log('allTranslations:', allTranslations);
-            
             // Initialize the intl-tel-input plugin with settings
             var iti = window.intlTelInput(phoneInput, {
                 loadUtilsOnInit: "https://cdn.jsdelivr.net/npm/intl-tel-input@24.7.0/build/js/utils.js",
