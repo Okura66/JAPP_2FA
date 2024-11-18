@@ -24,11 +24,16 @@
             border-radius: 3px;
             height: 35px;
         }
+
+        .loading {
+            opacity: 0.5;
+            pointer-events: none;
+        }
     </style>
 </head>
 
 <body>
-    <div id="main">
+    <div id="main" class="loading">
         <h3 id="labelText">Numéro de téléphone</h3>
         <input type="tel" id="phoneInput">
         <div id="errorMsg" class="error-message"></div>
@@ -44,116 +49,128 @@
                     fetch('https://cdn.jsdelivr.net/npm/intl-tel-input@24.7.0/build/js/i18n/fr/interface.js')
                 ]);
 
+                console.log('Countries response:', countriesResponse);
+                console.log('Interface response:', interfaceResponse);
+
+                if (!countriesResponse.ok || !interfaceResponse.ok) {
+                    throw new Error('Network response was not ok');
+                }
+
                 const countriesText = await countriesResponse.text();
                 const interfaceText = await interfaceResponse.text();
 
-                // Extraire le contenu des objets des fichiers JS
-                const countriesMatch = countriesText.match(/export default ({[\s\S]*});/);
-                const interfaceMatch = interfaceText.match(/export default ({[\s\S]*});/);
+                console.log('Countries text:', countriesText);
+                console.log('Interface text:', interfaceText);
 
-                if (!countriesMatch || !interfaceMatch) {
-                    throw new Error("Format de traduction inattendu");
-                }
+                // Extraction des objets de traduction
+                const countryTranslations = JSON.parse(countriesText.match(/const countryTranslations = ({[\s\S]*?});/)[1]);
+                const interfaceTranslations = JSON.parse(interfaceText.match(/const interfaceTranslations = ({[\s\S]*?});/)[1]);
 
-                // Évaluer les objets de traduction de manière sécurisée
-                const countryTranslations = Function(`return ${countriesMatch[1]}`)();
-                const interfaceTranslations = Function(`return ${interfaceMatch[1]}`)();
+                console.log('Country translations:', countryTranslations);
+                console.log('Interface translations:', interfaceTranslations);
 
-                // Combiner les traductions
                 return { ...countryTranslations, ...interfaceTranslations };
             } catch (error) {
-                console.error("Erreur lors du chargement des traductions:", error);
-                // Retourner un objet de traduction minimal en cas d'erreur
+                console.error('Failed to load translations:', error);
+                // En cas d'erreur, on retourne un objet minimal de traduction
                 return {
+                    fr: "France",
                     selectedCountryAriaLabel: "Pays sélectionné",
-                    searchPlaceholder: "Rechercher un pays",
-                    // ... autres traductions par défaut si nécessaire
+                    searchPlaceholder: "Recherche",
+                    // ... autres traductions minimales nécessaires
                 };
             }
         }
 
-        // Initialiser le widget une fois les traductions chargées
+        // Fonction d'initialisation du widget
         async function initializeWidget() {
-            const translations = await loadTranslations();
-            
-            JFCustomWidget.subscribe("ready", function () {
-                var label = JFCustomWidget.getWidgetSetting('WidgetLabel');
-                document.getElementById('labelText').innerHTML = label;
+            try {
+                const translations = await loadTranslations();
+                document.getElementById('main').classList.remove('loading');
 
-                var phoneInput = document.querySelector("#phoneInput");
-                var errorMsg = document.querySelector("#errorMsg");
+                JFCustomWidget.subscribe("ready", function () {
+                    var label = JFCustomWidget.getWidgetSetting('WidgetLabel');
+                    document.getElementById('labelText').innerHTML = label;
 
-                var initialCountry = JFCustomWidget.getWidgetSetting('InitialCountry') || "fr";
-                var countrySearch = JFCustomWidget.getWidgetSetting('CountrySearch') || "true";
-                var customErrorMessage = JFCustomWidget.getWidgetSetting('ErrorMessage') || "Veuillez entrer un numéro de téléphone valide.";
+                    var phoneInput = document.querySelector("#phoneInput");
+                    var errorMsg = document.querySelector("#errorMsg");
 
-                var iti = window.intlTelInput(phoneInput, {
-                    loadUtilsOnInit: "https://cdn.jsdelivr.net/npm/intl-tel-input@24.7.0/build/js/utils.js",
-                    initialCountry: initialCountry,
-                    useFullscreenPopup: false,
-                    countrySearch: countrySearch,
-                    fixDropdownWidth: true,
-                    strictMode: true,
-                    i18n: translations,  // Utilisation des traductions chargées
-                    validationNumberType: "MOBILE",
-                    dropdownContainer: document.body
-                });
+                    var initialCountry = JFCustomWidget.getWidgetSetting('InitialCountry') || "fr";
+                    var countrySearch = JFCustomWidget.getWidgetSetting('CountrySearch') || "true";
+                    var customErrorMessage = JFCustomWidget.getWidgetSetting('ErrorMessage') || "Veuillez entrer un numéro de téléphone valide.";
 
-                function resetError() {
-                    errorMsg.innerHTML = "";
-                }
+                    var iti = window.intlTelInput(phoneInput, {
+                        loadUtilsOnInit: "https://cdn.jsdelivr.net/npm/intl-tel-input@24.7.0/build/js/utils.js",
+                        initialCountry: initialCountry,
+                        useFullscreenPopup: false,
+                        countrySearch: countrySearch,
+                        fixDropdownWidth: true,
+                        strictMode: true,
+                        i18n: translations,
+                        validationNumberType: "MOBILE",
+                        dropdownContainer: document.body
+                    });
 
-                phoneInput.addEventListener('change', resetError);
-                phoneInput.addEventListener('keyup', resetError);
-                phoneInput.addEventListener('focus', resetError);
-
-                phoneInput.addEventListener('open:countrydropdown', function () {
-                    JFCustomWidget.requestFrameResize({ height: 330 });
-                });
-
-                phoneInput.addEventListener('close:countrydropdown', function () {
-                    JFCustomWidget.requestFrameResize({ height: 140 });
-                });
-
-                phoneInput.addEventListener('input', function () {
-                    if (iti.isValidNumber()) {
-                        try {
-                            var fullNumber = iti.getNumber();
-                            if (fullNumber) {
-                                JFCustomWidget.sendData({
-                                    valid: true,
-                                    value: fullNumber
-                                });
-                            }
-                        } catch (error) {
-                            console.error("Error retrieving full phone number:", error);
-                        }
-                    }
-                });
-
-                JFCustomWidget.subscribe("submit", function () {
-                    var msg = { valid: true, value: "" };
-
-                    if (iti.isValidNumber()) {
-                        try {
-                            var fullNumber = iti.getNumber();
-                            if (fullNumber) {
-                                msg.value = fullNumber;
-                            }
-                        } catch (error) {
-                            console.error("Error retrieving full phone number:", error);
-                        }
-                    } else {
-                        errorMsg.innerHTML = customErrorMessage;
-                        msg.valid = false;
+                    function resetError() {
+                        errorMsg.innerHTML = "";
                     }
 
-                    JFCustomWidget.sendSubmit(msg);
+                    phoneInput.addEventListener('change', resetError);
+                    phoneInput.addEventListener('keyup', resetError);
+                    phoneInput.addEventListener('focus', resetError);
+
+                    phoneInput.addEventListener('open:countrydropdown', function () {
+                        JFCustomWidget.requestFrameResize({ height: 330 });
+                    });
+
+                    phoneInput.addEventListener('close:countrydropdown', function () {
+                        JFCustomWidget.requestFrameResize({ height: 140 });
+                    });
+
+                    phoneInput.addEventListener('input', function () {
+                        if (iti.isValidNumber()) {
+                            try {
+                                var fullNumber = iti.getNumber();
+                                if (fullNumber) {
+                                    JFCustomWidget.sendData({
+                                        valid: true,
+                                        value: fullNumber
+                                    });
+                                }
+                            } catch (error) {
+                                console.error("Error retrieving full phone number:", error);
+                            }
+                        }
+                    });
+
+                    JFCustomWidget.subscribe("submit", function () {
+                        var msg = { valid: true, value: "" };
+
+                        if (iti.isValidNumber()) {
+                            try {
+                                var fullNumber = iti.getNumber();
+                                if (fullNumber) {
+                                    msg.value = fullNumber;
+                                }
+                            } catch (error) {
+                                console.error("Error retrieving full phone number:", error);
+                            }
+                        } else {
+                            errorMsg.innerHTML = customErrorMessage;
+                            msg.valid = false;
+                        }
+
+                        JFCustomWidget.sendSubmit(msg);
+                    });
                 });
-            });
+            } catch (error) {
+                console.error('Failed to initialize widget:', error);
+                document.getElementById('main').classList.remove('loading');
+                document.getElementById('errorMsg').innerHTML = "Une erreur s'est produite lors de l'initialisation du widget.";
+            }
         }
 
-        // Démarrer l'initialisation
+        // Démarrage de l'initialisation
         initializeWidget();
     </script>
 </body>
