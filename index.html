@@ -1,104 +1,84 @@
 <!DOCTYPE html>
 <html>
+
 <head>
+    <!-- Load the JotForm Custom Widget API -->
     <script src="https://js.jotform.com/JotFormCustomWidget.min.js"></script>
+
+    <!-- Load intl-tel-input CSS for styling the phone input field -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@24.7.0/build/css/intlTelInput.css">
     <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@24.7.0/build/js/intlTelInput.min.js"></script>
 
+    <!-- Custom CSS for error message styling and phone input field -->
     <style>
+        /* Style for error messages */
         .error-message {
             color: red;
             font-size: 0.9em;
             margin-top: 5px;
         }
 
+        /* Style for the phone input field */
         #phoneInput {
             width: 100%;
             height: 40px;
             border: 1px solid #d3d3d3;
         }
 
+        /* Style for the search input in the country dropdown */
         .iti__search-input {
             width: 100%;
             border-width: 0;
             border-radius: 3px;
             height: 35px;
         }
-
-        .loading {
-            opacity: 0.5;
-            pointer-events: none;
-        }
     </style>
 </head>
 
 <body>
-    <div id="main" class="loading">
+    <div id="main">
         <h3 id="labelText">Numéro de téléphone</h3>
+        <!-- The phone input field where users will enter their number -->
         <input type="tel" id="phoneInput">
+        <!-- Placeholder for displaying error messages -->
         <div id="errorMsg" class="error-message"></div>
         <p id="versionText">Version 0.1.0</p>
     </div>
 
     <script type="text/javascript">
-        // Fonction pour charger les traductions
-        async function loadTranslations() {
-            try {
-                const [countriesResponse, interfaceResponse] = await Promise.all([
-                    fetch('https://cdn.jsdelivr.net/npm/intl-tel-input@24.7.0/build/js/i18n/fr/countries.js'),
-                    fetch('https://cdn.jsdelivr.net/npm/intl-tel-input@24.7.0/build/js/i18n/fr/interface.js')
-                ]);
+        // Subscribe to the "ready" event to initialize the widget
+        JFCustomWidget.subscribe("ready", function () {
+            console.log("Ready event triggered.");
 
-                console.log('Countries response:', countriesResponse);
-                console.log('Interface response:', interfaceResponse);
-
-                if (!countriesResponse.ok || !interfaceResponse.ok) {
-                    throw new Error('Network response was not ok');
-                }
-
-                const countriesText = await countriesResponse.text();
-                const interfaceText = await interfaceResponse.text();
-
-                console.log('Countries text:', countriesText);
-                console.log('Interface text:', interfaceText);
-
-                // Extraction des objets de traduction
-                const countryTranslations = JSON.parse(countriesText.match(/const countryTranslations = ({[\s\S]*?});/)[1]);
-                const interfaceTranslations = JSON.parse(interfaceText.match(/const interfaceTranslations = ({[\s\S]*?});/)[1]);
-
-                console.log('Country translations:', countryTranslations);
-                console.log('Interface translations:', interfaceTranslations);
-
-                return { ...countryTranslations, ...interfaceTranslations };
-            } catch (error) {
-                console.error('Failed to load translations:', error);
-                // En cas d'erreur, on retourne un objet minimal de traduction
-                return {
-                    fr: "France",
-                    selectedCountryAriaLabel: "Pays sélectionné",
-                    searchPlaceholder: "Recherche",
-                    // ... autres traductions minimales nécessaires
-                };
+            function loadScript(url, callback) {
+                var script = document.createElement("script");
+                script.type = "text/javascript";
+                script.src = url;
+                script.onload = callback;
+                document.head.appendChild(script);
             }
-        }
-
-        // Fonction d'initialisation du widget
-        async function initializeWidget() {
-            try {
-                const translations = await loadTranslations();
-                document.getElementById('main').classList.remove('loading');
-
-                JFCustomWidget.subscribe("ready", function () {
+            // Charger les traductions du fichier "fr" depuis le CDN
+            loadScript("https://cdn.jsdelivr.net/npm/intl-tel-input@24.7.0/build/js/i18n/fr/countries.js", function () {
+                loadScript("https://cdn.jsdelivr.net/npm/intl-tel-input@24.7.0/build/js/i18n/fr/interface.js", function () {
+                    // Une fois les fichiers chargés, combiner les traductions
+                    const i18n = {
+                        ...countryTranslations,
+                        ...interfaceTranslations
+                    };
+                    // Get the widget label setting and update the label text
                     var label = JFCustomWidget.getWidgetSetting('WidgetLabel');
                     document.getElementById('labelText').innerHTML = label;
 
+                    // Select the phone input and error message elements
                     var phoneInput = document.querySelector("#phoneInput");
                     var errorMsg = document.querySelector("#errorMsg");
 
+                    // Get initial settings for the phone input
                     var initialCountry = JFCustomWidget.getWidgetSetting('InitialCountry') || "fr";
                     var countrySearch = JFCustomWidget.getWidgetSetting('CountrySearch') || "true";
                     var customErrorMessage = JFCustomWidget.getWidgetSetting('ErrorMessage') || "Veuillez entrer un numéro de téléphone valide.";
 
+                    // Initialize the intl-tel-input plugin with settings
                     var iti = window.intlTelInput(phoneInput, {
                         loadUtilsOnInit: "https://cdn.jsdelivr.net/npm/intl-tel-input@24.7.0/build/js/utils.js",
                         initialCountry: initialCountry,
@@ -106,27 +86,32 @@
                         countrySearch: countrySearch,
                         fixDropdownWidth: true,
                         strictMode: true,
-                        i18n: translations,
+                        i18n: i18n,
                         validationNumberType: "MOBILE",
-                        dropdownContainer: document.body
+                        dropdownContainer: document.body // Append the country dropdown to the body
                     });
 
+                    // Function to reset the error message
                     function resetError() {
                         errorMsg.innerHTML = "";
                     }
 
+                    // Add event listeners to reset error message on input change or focus
                     phoneInput.addEventListener('change', resetError);
                     phoneInput.addEventListener('keyup', resetError);
                     phoneInput.addEventListener('focus', resetError);
 
+                    // Add event listener to resize iframe when the dropdown is opened
                     phoneInput.addEventListener('open:countrydropdown', function () {
-                        JFCustomWidget.requestFrameResize({ height: 330 });
+                        JFCustomWidget.requestFrameResize({ height: 330 }); // Adjust height as needed
                     });
 
+                    // Add event listener to resize iframe when the dropdown is closed
                     phoneInput.addEventListener('close:countrydropdown', function () {
-                        JFCustomWidget.requestFrameResize({ height: 140 });
+                        JFCustomWidget.requestFrameResize({ height: 140 }); // Reset height to original or desired value
                     });
 
+                    // Add event listener to send data as soon as it is valid
                     phoneInput.addEventListener('input', function () {
                         if (iti.isValidNumber()) {
                             try {
@@ -136,6 +121,7 @@
                                         valid: true,
                                         value: fullNumber
                                     });
+                                    console.log("Data sent:", fullNumber);
                                 }
                             } catch (error) {
                                 console.error("Error retrieving full phone number:", error);
@@ -143,35 +129,41 @@
                         }
                     });
 
+                    // Subscribe to the "submit" event to validate and send data when the form is submitted
                     JFCustomWidget.subscribe("submit", function () {
-                        var msg = { valid: true, value: "" };
+                        console.log("Submit event triggered.");
+                        var msg = { valid: true, value: "" }; // Initialize msg once
 
                         if (iti.isValidNumber()) {
+                            console.log("Phone number is valid:", iti.isValidNumber());
+
                             try {
                                 var fullNumber = iti.getNumber();
                                 if (fullNumber) {
-                                    msg.value = fullNumber;
+                                    msg.value = fullNumber; // Set the full phone number with the country code
+                                } else {
+                                    console.error("Full phone number is null.");
                                 }
                             } catch (error) {
                                 console.error("Error retrieving full phone number:", error);
                             }
+
                         } else {
+                            console.log("Phone number is not valid.");
+                            // Display error message
                             errorMsg.innerHTML = customErrorMessage;
+                            // Mark the widget as invalid so the form does not submit
                             msg.valid = false;
                         }
 
+                        console.log("Before sending submit message:", msg);
                         JFCustomWidget.sendSubmit(msg);
+                        console.log("After sending submit message.");
                     });
                 });
-            } catch (error) {
-                console.error('Failed to initialize widget:', error);
-                document.getElementById('main').classList.remove('loading');
-                document.getElementById('errorMsg').innerHTML = "Une erreur s'est produite lors de l'initialisation du widget.";
-            }
-        }
-
-        // Démarrage de l'initialisation
-        initializeWidget();
+            });
+        });
     </script>
 </body>
+
 </html>
