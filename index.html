@@ -42,7 +42,7 @@
         <input type="tel" id="phoneInput">
         <!-- Placeholder for displaying error messages -->
         <div id="errorMsg" class="error-message"></div>
-        <p id="versionText">Version 0.1.122</p>
+        <p id="versionText">Version 0.1.123</p>
     </div>
 
     <script type="text/javascript">
@@ -89,7 +89,10 @@
                         fixDropdownWidth: true,
                         strictMode: true,
                         validationNumberType: "MOBILE",
-                        i18n: countryLanguage,
+                        i18n: {
+                            ...fr,
+                            searchPlaceholder: "Recherche de pays",
+                          },
                         dropdownContainer: document.body // Append the country dropdown to the body
                     });
         
