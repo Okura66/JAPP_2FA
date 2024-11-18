@@ -42,7 +42,7 @@
         <input type="tel" id="phoneInput">
         <!-- Placeholder for displaying error messages -->
         <div id="errorMsg" class="error-message"></div>
-        <p id="versionText">Version 0.1.121</p>
+        <p id="versionText">Version 0.1.122</p>
     </div>
 
     <script type="text/javascript">
@@ -55,6 +55,7 @@
             document.getElementById('labelText').innerHTML = label;
         
             // Get initial settings for the phone input
+            var countryLanguage = JFCustomWidget.getWidgetSetting('CountryLanguage') || "fr";
             var initialCountry = JFCustomWidget.getWidgetSetting('InitialCountry') || "fr";
             var countrySearch = JFCustomWidget.getWidgetSetting('CountrySearch') || "true";
             var customErrorMessage = JFCustomWidget.getWidgetSetting('ErrorMessage') || "Veuillez entrer un numéro de téléphone valide.";
@@ -71,7 +72,7 @@
             }
 
             // Dynamically load the i18n module for the selected country
-            loadI18nModule(initialCountry)
+            loadI18nModule(countryLanguage)
                 .then(() => {
                     console.log(`i18n module for ${initialCountry} loaded successfully.`);
         
@@ -88,6 +89,7 @@
                         fixDropdownWidth: true,
                         strictMode: true,
                         validationNumberType: "MOBILE",
+                        i18n: countryLanguage,
                         dropdownContainer: document.body // Append the country dropdown to the body
                     });
         
