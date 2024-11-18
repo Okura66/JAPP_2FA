@@ -42,7 +42,7 @@
         <input type="tel" id="phoneInput">
         <!-- Placeholder for displaying error messages -->
         <div id="errorMsg" class="error-message"></div>
-        <p id="versionText">Version 0.0.127</p>
+        <p id="versionText">Version 0.0.139</p>
     </div>
 
     <script type="module">
@@ -63,11 +63,15 @@
 
             // Get initial settings for the phone input
             var initialCountry = JFCustomWidget.getWidgetSetting('InitialCountry') || "fr";
+            console.log("Initial Country:", initialCountry);
             var countrySearch = JFCustomWidget.getWidgetSetting('CountrySearch') || "true";
+            console.log("Country Search Enabled:", countrySearch);
             var customErrorMessage = JFCustomWidget.getWidgetSetting('ErrorMessage') || "Please enter a valid phone number.";
+            console.log("Custom Error Message:", customErrorMessage);
             var language = JFCustomWidget.getWidgetSetting('Language') || "fr";
+            console.log("Language:", language);
             var countryOrder = JFCustomWidget.getWidgetSetting('CountryOrder') || ["fr", "be", "ch"];
-
+            console.log("Country Order:", countryOrder);
 
             // Initialize the intl-tel-input plugin with settings
             var iti = window.intlTelInput(phoneInput, {
