@@ -63,6 +63,27 @@
             var countrySearch = JFCustomWidget.getWidgetSetting('CountrySearch') || "true";
             var customErrorMessage = JFCustomWidget.getWidgetSetting('ErrorMessage') || "Veuillez entrer un numéro de téléphone valide.";
 
+            fetch("https://cdn.jsdelivr.net/npm/intl-tel-input@24.7.0/build/js/i18n/fr/index.js")
+                .then(response => response.text())
+                .then(data => {
+                    // Create a new function to evaluate the module code
+                    const moduleFunction = new Function('exports', 'require', 'module', '__filename', '__dirname', data);
+                    
+                    // Create a mock module object
+                    const module = { exports: {} };
+                    
+                    // Execute the module function to populate module.exports
+                    moduleFunction(module.exports, null, module, null, null);
+                    
+                    // Access the allTranslations variable from module.exports
+                    const allTranslations = module.exports.default;
+                    
+                    console.log(allTranslations);
+                })
+                .catch(error => console.error('Error loading translations:', error));
+
+
+            
             // Initialize the intl-tel-input plugin with settings
             var iti = window.intlTelInput(phoneInput, {
                 loadUtilsOnInit: "https://cdn.jsdelivr.net/npm/intl-tel-input@24.7.0/build/js/utils.js",
