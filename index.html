@@ -42,60 +42,30 @@
         <input type="tel" id="phoneInput">
         <!-- Placeholder for displaying error messages -->
         <div id="errorMsg" class="error-message"></div>
-        <p id="versionText">Version 0.1.3</p>
+        <p id="versionText">Version 0.1.1</p>
     </div>
 
     <script type="module">
         // Subscribe to the "ready" event to initialize the widget
 
         console.log("Navigator language:", navigator.language || navigator.userLanguage);
-        import { 
-            ar, bg, bn, bs, ca, cs, da, de, el, en, es, fa, fi, fr, hi, hr, 
-            hu, id, it, ja, ko, mr, nl, no, pl, pt, ro, ru, sk, sv, te, th, 
-            tr, ur, vi, zh 
-          } from 'https://cdn.jsdelivr.net/npm/intl-tel-input@24.7.0/build/js/i18n/index.js';
-          
-          const languages = {
-            ar,
-            bg,
-            bn,
-            bs,
-            ca,
-            cs,
-            da,
-            de,
-            el,
-            en,
-            es,
-            fa,
-            fi,
-            fr,
-            hi,
-            hr,
-            hu,
-            id,
-            it,
-            ja,
-            ko,
-            mr,
-            nl,
-            no,
-            pl,
-            pt,
-            ro,
-            ru,
-            sk,
-            sv,
-            te,
-            th,
-            tr,
-            ur,
-            vi,
-            zh,
-          };
-          
-          // Utilisation exemple
-          console.log(languages.fr); // Traduction française
+        const language = (navigator.language || navigator.userLanguage).split('-')[0];
+        const langCode = language.slice(0, 2);
+
+        async function loadTranslations(langCode) {
+            try {
+                const module = await import(`https://cdn.jsdelivr.net/npm/intl-tel-input@24.7.0/build/js/i18n/${langCode}/index.js`);
+                return module.default;
+            } catch (error) {
+                console.error(`Failed to load translations for ${langCode}, defaulting to 'en'.`, error);
+                const module = await import('https://cdn.jsdelivr.net/npm/intl-tel-input@24.7.0/build/js/i18n/en/index.js');
+                return module.default;
+            }
+        }
+
+        loadTranslations(langCode).then(allTranslations => {
+            console.log(allTranslations);
+        });
 
         JFCustomWidget.subscribe("ready", function () {
             console.log("Ready event triggered.");
