@@ -42,7 +42,7 @@
         <input type="tel" id="phoneInput">
         <!-- Placeholder for displaying error messages -->
         <div id="errorMsg" class="error-message"></div>
-        <p id="versionText">Version 0.0.121</p>
+        <p id="versionText">Version 0.0.122</p>
     </div>
 
     <script type="module">
@@ -51,6 +51,12 @@
         console.log("Navigator language:", navigator.language || navigator.userLanguage);
         import { default as allTranslations } from 'https://cdn.jsdelivr.net/npm/intl-tel-input@24.7.0/build/js/i18n/fr/index.js';
         console.log(allTranslations);
+
+        (async () => {
+            const i18n = await import('./i18n.js');
+            console.log(i18n);
+        })();
+
 
         JFCustomWidget.subscribe("ready", function () {
             console.log("Ready event triggered.");
