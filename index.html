@@ -42,15 +42,11 @@
         <input type="tel" id="phoneInput">
         <!-- Placeholder for displaying error messages -->
         <div id="errorMsg" class="error-message"></div>
-        <p id="versionText">Version 0.0.122</p>
+        <p id="versionText">Version 0.0.123</p>
     </div>
 
     <script type="module">
         // Subscribe to the "ready" event to initialize the widget
-
-        console.log("Navigator language:", navigator.language || navigator.userLanguage);
-        import { default as allTranslations } from 'https://cdn.jsdelivr.net/npm/intl-tel-input@24.7.0/build/js/i18n/fr/index.js';
-        console.log(allTranslations);
 
         (async () => {
             const i18n = await import('./i18n.js');
@@ -84,7 +80,7 @@
                 strictMode: true,
                 validationNumberType: "MOBILE",
                 dropdownContainer: document.body, // Append the country dropdown to the body
-                i18n: allTranslations
+                i18n: i18n.fr
             });
 
             // Function to reset the error message
