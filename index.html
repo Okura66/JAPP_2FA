@@ -42,15 +42,15 @@
         <input type="tel" id="phoneInput">
         <!-- Placeholder for displaying error messages -->
         <div id="errorMsg" class="error-message"></div>
-        <p id="versionText">Version 0.0.126</p>
+        <p id="versionText">Version 0.0.127</p>
     </div>
 
     <script type="module">
         // Subscribe to the "ready" event to initialize the widget
 
         const i18n = await import('./i18n.js');
-        console.log(i18n);
-        
+        console.log(i18n.fr);
+
         JFCustomWidget.subscribe("ready", async function () {
             console.log("Ready event triggered.");
 
@@ -76,8 +76,7 @@
                 fixDropdownWidth: true,
                 strictMode: true,
                 validationNumberType: "MOBILE",
-                dropdownContainer: document.body, // Append the country dropdown to the body
-                i18n: i18n.fr
+                dropdownContainer: document.body // Append the country dropdown to the body
             });
 
             // Function to reset the error message
