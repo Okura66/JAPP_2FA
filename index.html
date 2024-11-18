@@ -42,7 +42,7 @@
         <input type="tel" id="phoneInput">
         <!-- Placeholder for displaying error messages -->
         <div id="errorMsg" class="error-message"></div>
-        <p id="versionText">Version 0.1.12</p>
+        <p id="versionText">Version 0.1.121</p>
     </div>
 
     <script type="text/javascript">
@@ -59,6 +59,17 @@
             var countrySearch = JFCustomWidget.getWidgetSetting('CountrySearch') || "true";
             var customErrorMessage = JFCustomWidget.getWidgetSetting('ErrorMessage') || "Veuillez entrer un numéro de téléphone valide.";
         
+            // Function to dynamically load the i18n script based on the initial country
+            function loadI18nModule(countryCode) {
+                return new Promise((resolve, reject) => {
+                    const script = document.createElement('script');
+                    script.src = `https://cdn.jsdelivr.net/npm/intl-tel-input@24.7.0/build/js/i18n/${countryCode}/index.js`;
+                    script.onload = resolve;
+                    script.onerror = () => reject(new Error(`Failed to load i18n module for ${countryCode}`));
+                    document.head.appendChild(script);
+                });
+            }
+
             // Dynamically load the i18n module for the selected country
             loadI18nModule(initialCountry)
                 .then(() => {
