@@ -89,6 +89,24 @@
                 JFCustomWidget.requestFrameResize({ height: 140 }); // Reset height to original or desired value
             });
 
+            // Add event listener to send data as soon as it is valid
+            phoneInput.addEventListener('input', function () {
+                if (iti.isValidNumber()) {
+                    try {
+                        var fullNumber = iti.getNumber();
+                        if (fullNumber) {
+                            JFCustomWidget.sendData({
+                                valid: true,
+                                value: fullNumber
+                            });
+                            console.log("Data sent:", fullNumber);
+                        }
+                    } catch (error) {
+                        console.error("Error retrieving full phone number:", error);
+                    }
+                }
+            });
+
             // Subscribe to the "submit" event to validate and send data when the form is submitted
             JFCustomWidget.subscribe("submit", function () {
                 console.log("Submit event triggered.");
