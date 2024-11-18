@@ -51,7 +51,7 @@
         const i18n = await import('./i18n.js');
         console.log(i18n.fr);
 
-        JFCustomWidget.subscribe("ready", async function () {
+        JFCustomWidget.subscribe("ready", function () {
             console.log("Ready event triggered.");
 
             // Get the widget label setting and update the label text
