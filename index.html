@@ -48,7 +48,7 @@
     <script type="module">
         // Subscribe to the "ready" event to initialize the widget
 
-        import { fr } from './i18n.js';
+        import * as i18n from './i18n.js';
 
         JFCustomWidget.subscribe("ready", function () {
             console.log("Ready event triggered.");
@@ -76,7 +76,7 @@
                 strictMode: true,
                 validationNumberType: "MOBILE",
                 dropdownContainer: document.body, // Append the country dropdown to the body
-                i18n: fr
+                i18n: i18n.fr
             });
 
             // Function to reset the error message
