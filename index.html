@@ -42,7 +42,7 @@
         <input type="tel" id="phoneInput">
         <!-- Placeholder for displaying error messages -->
         <div id="errorMsg" class="error-message"></div>
-        <p id="versionText">Version 0.0.139</p>
+        <p id="versionText">Version 0.0.142</p>
     </div>
 
     <script type="module">
@@ -70,7 +70,8 @@
             console.log("Custom Error Message:", customErrorMessage);
             var language = JFCustomWidget.getWidgetSetting('Language') ?? "en";
             console.log("Language:", language);
-            var countryOrder = JFCustomWidget.getWidgetSetting('CountryOrder') ?? null;
+            var countryOrderSetting = JFCustomWidget.getWidgetSetting('CountryOrder') ?? null;
+            var countryOrder = countryOrderSetting ? countryOrderSetting.split(',') : [];
             console.log("Country Order:", countryOrder);
 
             // Initialize the intl-tel-input plugin with settings
