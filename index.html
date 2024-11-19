@@ -42,7 +42,7 @@
         <input type="tel" id="phoneInput">
         <!-- Placeholder for displaying error messages -->
         <div id="errorMsg" class="error-message"></div>
-        <p id="versionText">Version 0.0.142</p>
+        <!-- <p id="versionText">Version 0.0.143</p> -->
     </div>
 
     <script type="module">
@@ -51,7 +51,7 @@
         import * as i18n from './i18n.js';
 
         JFCustomWidget.subscribe("ready", function () {
-            console.log("Ready event triggered.");
+            // console.log("Ready event triggered.");
 
             // Get the widget label setting and update the label text
             var label = JFCustomWidget.getWidgetSetting('WidgetLabel');
@@ -63,16 +63,16 @@
 
             // Get initial settings for the phone input
             var initialCountry = JFCustomWidget.getWidgetSetting('InitialCountry') ?? "en";
-            console.log("Initial Country:", initialCountry);
+            // console.log("Initial Country:", initialCountry);
             var countrySearch = JFCustomWidget.getWidgetSetting('CountrySearch') ?? "true";
-            console.log("Country Search Enabled:", countrySearch);
+            // console.log("Country Search Enabled:", countrySearch);
             var customErrorMessage = JFCustomWidget.getWidgetSetting('ErrorMessage') ?? "Please enter a valid phone number.";
-            console.log("Custom Error Message:", customErrorMessage);
+            // console.log("Custom Error Message:", customErrorMessage);
             var language = JFCustomWidget.getWidgetSetting('Language') ?? "en";
-            console.log("Language:", language);
+            // console.log("Language:", language);
             var countryOrderSetting = JFCustomWidget.getWidgetSetting('CountryOrder') ?? null;
             var countryOrder = countryOrderSetting ? countryOrderSetting.split(',') : [];
-            console.log("Country Order:", countryOrder);
+            // console.log("Country Order:", countryOrder);
 
             // Initialize the intl-tel-input plugin with settings
             var iti = window.intlTelInput(phoneInput, {
@@ -118,7 +118,7 @@
                                 valid: true,
                                 value: fullNumber
                             });
-                            console.log("Data sent:", fullNumber);
+                            // console.log("Data sent:", fullNumber);
                         }
                     } catch (error) {
                         console.error("Error retrieving full phone number:", error);
@@ -128,11 +128,11 @@
 
             // Subscribe to the "submit" event to validate and send data when the form is submitted
             JFCustomWidget.subscribe("submit", function () {
-                console.log("Submit event triggered.");
+                // console.log("Submit event triggered.");
                 var msg = { valid: true, value: "" }; // Initialize msg once
 
                 if (iti.isValidNumber()) {
-                    console.log("Phone number is valid:", iti.isValidNumber());
+                    // console.log("Phone number is valid:", iti.isValidNumber());
 
                     try {
                         var fullNumber = iti.getNumber();
@@ -146,16 +146,16 @@
                     }
 
                 } else {
-                    console.log("Phone number is not valid.");
+                    // console.log("Phone number is not valid.");
                     // Display error message
                     errorMsg.innerHTML = customErrorMessage;
                     // Mark the widget as invalid so the form does not submit
                     msg.valid = false;
                 }
 
-                console.log("Before sending submit message:", msg);
+                // console.log("Before sending submit message:", msg);
                 JFCustomWidget.sendSubmit(msg);
-                console.log("After sending submit message.");
+                // console.log("After sending submit message.");
             });
         });
     </script>
