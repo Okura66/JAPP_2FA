@@ -105,7 +105,7 @@
 
             // Add event listener to resize iframe when the dropdown is closed
             phoneInput.addEventListener('close:countrydropdown', function () {
-                JFCustomWidget.requestFrameResize({ height: undefined }); // Reset height to original or desired value
+                JFCustomWidget.requestFrameResize(); // Reset height to original or desired value
             });
 
             // Add event listener to send data as soon as it is valid
