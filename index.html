@@ -37,8 +37,6 @@
 
 <body>
     <div id="main">
-        <h3 id="labelText">Numéro de téléphone</h3>
-        <!-- The phone input field where users will enter their number -->
         <input type="tel" id="phoneInput">
         <!-- Placeholder for displaying error messages -->
         <div id="errorMsg" class="error-message"></div>
@@ -52,10 +50,6 @@
 
         JFCustomWidget.subscribe("ready", function () {
             // console.log("Ready event triggered.");
-
-            // Get the widget label setting and update the label text
-            var label = JFCustomWidget.getWidgetSetting('WidgetLabel');
-            document.getElementById('labelText').innerHTML = label;
 
             // Select the phone input and error message elements
             var phoneInput = document.querySelector("#phoneInput");
