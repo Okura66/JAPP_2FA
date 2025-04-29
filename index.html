@@ -79,18 +79,22 @@ JFCustomWidget.subscribe('ready', () => {
   const code2faError = document.getElementById('code2faError');
   const code2faSuccess = document.getElementById('code2faSuccess');
 
-  const initialCountry = JFCustomWidget.getWidgetSetting('InitialCountry') || 'auto';
-  const countrySearch = JFCustomWidget.getWidgetSetting('CountrySearch') === 'true';
-  const customErrorMessage = JFCustomWidget.getWidgetSetting('ErrorMessage') || 'Veuillez saisir un numéro valide.';
-  const language = JFCustomWidget.getWidgetSetting('Language') || 'fr';
-  const countryOrder = (JFCustomWidget.getWidgetSetting('CountryOrder') || '').split(',').filter(Boolean);
-  const smsapiToken = JFCustomWidget.getWidgetSetting('SMSAPIToken') || '';
-  const smsapiSender = JFCustomWidget.getWidgetSetting('SMSAPISender') || null;
-  const smsapiContent = JFCustomWidget.getWidgetSetting('SMSAPIContent') || null;
+  const settings = JFCustomWidget.getWidgetSettings();
+  const initialCountry = settings?.InitialCountry || 'auto';
+  const countrySearch = settings?.CountrySearch === 'true';
+  const customErrorMessage = settings?.ErrorMessage || 'Veuillez saisir un numéro valide.';
+  const language = settings?.Language || 'fr';
+  const countryOrder = typeof settings?.CountryOrder === 'string'
+    ? settings.CountryOrder.split(',').filter(Boolean)
+    : [];
+  const smsapiToken = settings?.SMSAPIToken || '';
+  const smsapiSender = settings?.SMSAPISender || null;
+  const smsapiContent = settings?.SMSAPIContent || null;
 
   const iti = window.intlTelInput(phoneInput, {
     utilsScript: 'https://cdn.jsdelivr.net/npm/intl-tel-input@24.7.0/build/js/utils.js',
     initialCountry,
+    useFullscreenPopup: false,
     countrySearch,
     strictMode: true,
     countryOrder,
