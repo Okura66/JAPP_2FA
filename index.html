@@ -40,11 +40,11 @@ const proxyBaseURL = 'https://send2fa-853381140514.europe-west2.run.app';
 
 async function envoyerCode2FA(token, phoneNumber, sender = null, content = null, fast = 1) {
   const headers = { 'Content-Type': 'application/json' };
-  const payload = { token, phoneNumber, sender, content, fast };
+  const payload = { action: 'send', token, phoneNumber, sender, content, fast };
   console.log('[2FA] Envoi de code via Cloud Function :', payload);
 
   try {
-    const response = await fetch(`${proxyBaseURL}`, {
+    const response = await fetch(proxyBaseURL, {
       method: 'POST',
       headers,
       body: JSON.stringify(payload)
@@ -67,12 +67,12 @@ async function envoyerCode2FA(token, phoneNumber, sender = null, content = null,
 
 async function verifierCode2FA(token, codeId, code) {
   const headers = { 'Content-Type': 'application/json' };
-  const payload = { token, codeId, code };
+  const payload = { action: 'verify', token, codeId, code };
 
   console.log('[2FA] Vérification via proxy:', payload);
 
   try {
-    const response = await fetch(`${proxyBaseURL}/verify`, {
+    const response = await fetch(proxyBaseURL, {
       method: 'POST',
       headers,
       body: JSON.stringify(payload)
@@ -101,7 +101,6 @@ JFCustomWidget.subscribe('ready', () => {
   const code2faError = document.getElementById('code2faError');
   const code2faSuccess = document.getElementById('code2faSuccess');
 
-  // ✅ Récupération des settings
   const settings = JFCustomWidget.getWidgetSettings();
   console.log('[Widget] Settings récupérés:', settings);
 
@@ -112,6 +111,7 @@ JFCustomWidget.subscribe('ready', () => {
   const countryOrder = typeof settings?.CountryOrder === 'string'
     ? settings.CountryOrder.split(',').filter(Boolean)
     : [];
+
   const smsapiToken = settings?.SMSAPIToken || '';
   const smsapiSender = settings?.SMSAPISender || null;
   const smsapiContent = settings?.SMSAPIContent || null;
