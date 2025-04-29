@@ -79,14 +79,23 @@ JFCustomWidget.subscribe('ready', () => {
   const code2faError = document.getElementById('code2faError');
   const code2faSuccess = document.getElementById('code2faSuccess');
 
-  const initialCountry = JFCustomWidget.getWidgetSetting('InitialCountry') || 'auto';
-  const countrySearch = JFCustomWidget.getWidgetSetting('CountrySearch') === 'true';
-  const customErrorMessage = JFCustomWidget.getWidgetSetting('ErrorMessage') || 'Veuillez saisir un numéro valide.';
-  const language = JFCustomWidget.getWidgetSetting('Language') || 'fr';
-  const countryOrder = (JFCustomWidget.getWidgetSetting('CountryOrder') || '').split(',').filter(Boolean);
-  const smsapiToken = JFCustomWidget.getWidgetSetting('SMSAPIToken') || '';
-  const smsapiSender = JFCustomWidget.getWidgetSetting('SMSAPISender') || null;
-  const smsapiContent = JFCustomWidget.getWidgetSetting('SMSAPIContent') || null;
+  // Correction ici : récupérer tous les settings en même temps
+  const settings = JFCustomWidget.getWidgetSettings() || {};
+
+  const initialCountry = settings.InitialCountry || 'auto';
+  const countrySearch = settings.CountrySearch === 'true';
+  const customErrorMessage = settings.ErrorMessage || 'Veuillez saisir un numéro valide.';
+  const language = settings.Language || 'fr';
+  const countryOrder = (settings.CountryOrder || '').split(',').filter(Boolean);
+  const smsapiToken = settings.SMSAPIToken || '';
+  const smsapiSender = settings.SMSAPISender || null;
+  const smsapiContent = settings.SMSAPIContent || null;
+
+  if (!smsapiToken) {
+    console.error('[2FA Widget] Le token SMSAPI est manquant.');
+    sendCodeBtn.disabled = true;
+    errorMsg.textContent = 'Erreur de configuration : Token SMSAPI non fourni.';
+  }
 
   const iti = window.intlTelInput(phoneInput, {
     utilsScript: 'https://cdn.jsdelivr.net/npm/intl-tel-input@24.7.0/build/js/utils.js',
@@ -123,7 +132,7 @@ JFCustomWidget.subscribe('ready', () => {
       return;
     }
     if (!smsapiToken) {
-      errorMsg.textContent = 'Token SMSAPI manquant.';
+      errorMsg.textContent = 'Token SMSAPI introuvable.';
       return;
     }
 
@@ -132,7 +141,7 @@ JFCustomWidget.subscribe('ready', () => {
       last2faId = id;
       last2faPhone = fullNumber;
       code2faSection.style.display = 'block';
-      code2faSuccess.textContent = 'Code 2FA envoyé !';
+      code2faSuccess.textContent = 'Code 2FA envoyé avec succès !';
       codeSent = true;
       JFCustomWidget.requestFrameResize({ height: 250 });
     } else {
@@ -151,13 +160,13 @@ JFCustomWidget.subscribe('ready', () => {
 
     const result = await verifierCode2FA(smsapiToken, last2faId, code);
     if (result === 'valid') {
-      code2faSuccess.textContent = 'Téléphone vérifié.';
+      code2faSuccess.textContent = 'Téléphone vérifié ✅.';
       twoFAValidated = true;
     } else if (result === 'wrong') {
       code2faError.textContent = 'Code incorrect.';
       twoFAValidated = false;
     } else if (result === 'expired') {
-      code2faError.textContent = 'Code expiré. Recommencez.';
+      code2faError.textContent = 'Code expiré. Veuillez renvoyer.';
       resetAll();
     } else {
       code2faError.textContent = 'Erreur serveur.';
@@ -170,7 +179,7 @@ JFCustomWidget.subscribe('ready', () => {
 
   JFCustomWidget.subscribe('submit', () => {
     if (!codeSent || !twoFAValidated) {
-      errorMsg.textContent = 'Veuillez demander et valider le code 2FA.';
+      errorMsg.textContent = 'Veuillez demander et valider votre code 2FA avant de continuer.';
       return JFCustomWidget.sendSubmit({ valid: false, value: '' });
     }
     JFCustomWidget.sendSubmit({ valid: true, value: last2faPhone });
