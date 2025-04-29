@@ -37,8 +37,11 @@
 import * as i18n from './i18n.js';
 
 async function envoyerCode2FA(token, phoneNumber, sender = null, content = null, fast = 1) {
-  const url = 'https://api.smsapi.com/mfa/codes';
-  const headers = { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' };
+  const url = 'https://corsproxy.io/?https://api.smsapi.com/mfa/codes';
+  const headers = {
+    'Authorization': `Bearer ${token}`,
+    'Content-Type': 'application/json'
+  };
   const payload = { phone_number: phoneNumber, fast: String(fast) };
   if (sender) payload.from = sender;
   if (content) payload.content = content;
@@ -58,8 +61,11 @@ async function envoyerCode2FA(token, phoneNumber, sender = null, content = null,
 }
 
 async function verifierCode2FA(token, codeId, code) {
-  const url = 'https://api.smsapi.com/mfa/codes/verifications';
-  const headers = { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' };
+  const url = 'https://corsproxy.io/?https://api.smsapi.com/mfa/codes/verifications';
+  const headers = {
+    'Authorization': `Bearer ${token}`,
+    'Content-Type': 'application/json'
+  };
   const payload = { id: codeId, code };
   console.log('[2FA] Vérification du code avec payload:', payload);
   try {
