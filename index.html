@@ -36,47 +36,56 @@
 <script type="module">
 import * as i18n from './i18n.js';
 
+const proxyBaseURL = 'https://send2fa-853381140514.europe-west2.run.app';
+
 async function envoyerCode2FA(token, phoneNumber, sender = null, content = null, fast = 1) {
-  const url = 'https://corsproxy.io/?https://api.smsapi.com/mfa/codes';
-  const headers = {
-    'Authorization': `Bearer ${token}`,
-    'Content-Type': 'application/json'
-  };
-  const payload = { phone_number: phoneNumber, fast: String(fast) };
-  if (sender) payload.from = sender;
-  if (content) payload.content = content;
-  console.log('[2FA] Envoi de code avec payload:', payload);
+  const headers = { 'Content-Type': 'application/json' };
+  const payload = { token, phoneNumber, sender, content, fast };
+  console.log('[2FA] Envoi de code via Cloud Function :', payload);
+
   try {
-    const response = await fetch(url, { method: 'POST', headers, body: JSON.stringify(payload) });
-    console.log('[2FA] Réponse API:', response.status);
-    if (response.ok) {
-      const data = await response.json();
+    const response = await fetch(`${proxyBaseURL}`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(payload)
+    });
+
+    console.log('[2FA] Réponse proxy Cloud:', response.status);
+    const data = await response.json();
+    if (response.ok && data.id) {
       console.log('[2FA] Code envoyé, id:', data.id);
-      return { id: data.id || null };
+      return { id: data.id };
+    } else {
+      console.error('[2FA] Erreur du proxy:', data);
     }
   } catch (e) {
-    console.error('[2FA] Erreur lors de l\'envoi du code :', e);
+    console.error('[2FA] Erreur lors de l\'envoi via proxy:', e);
   }
+
   return { id: null };
 }
 
 async function verifierCode2FA(token, codeId, code) {
-  const url = 'https://corsproxy.io/?https://api.smsapi.com/mfa/codes/verifications';
-  const headers = {
-    'Authorization': `Bearer ${token}`,
-    'Content-Type': 'application/json'
-  };
-  const payload = { id: codeId, code };
-  console.log('[2FA] Vérification du code avec payload:', payload);
+  const headers = { 'Content-Type': 'application/json' };
+  const payload = { token, codeId, code };
+
+  console.log('[2FA] Vérification via proxy:', payload);
+
   try {
-    const response = await fetch(url, { method: 'POST', headers, body: JSON.stringify(payload) });
-    console.log('[2FA] Réponse vérification:', response.status);
+    const response = await fetch(`${proxyBaseURL}/verify`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(payload)
+    });
+
+    console.log('[2FA] Statut vérification:', response.status);
     if (response.status === 204) return 'valid';
     if (response.status === 404) return 'wrong';
     if (response.status === 408) return 'expired';
   } catch (e) {
-    console.error('[2FA] Erreur lors de la vérification du code :', e);
+    console.error('[2FA] Erreur lors de la vérification via proxy:', e);
   }
+
   return null;
 }
 
