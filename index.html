@@ -84,11 +84,10 @@ JFCustomWidget.subscribe('ready', () => {
   const customErrorMessage = JFCustomWidget.getWidgetSetting('ErrorMessage') || 'Veuillez saisir un numéro valide.';
   const language = JFCustomWidget.getWidgetSetting('Language') || 'fr';
   const countryOrder = (JFCustomWidget.getWidgetSetting('CountryOrder') || '').split(',').filter(Boolean);
-  const settings = JFCustomWidget.getWidgetSettings();
-  const smsapiToken = settings?.SMSAPIToken || '';
-  const smsapiSender = settings?.SMSAPISender || null;
-  const smsapiContent = settings?.SMSAPIContent || null;
-  
+  const smsapiToken = JFCustomWidget.getWidgetSetting('SMSAPIToken') || '';
+  const smsapiSender = JFCustomWidget.getWidgetSetting('SMSAPISender') || null;
+  const smsapiContent = JFCustomWidget.getWidgetSetting('SMSAPIContent') || null;
+
   const iti = window.intlTelInput(phoneInput, {
     utilsScript: 'https://cdn.jsdelivr.net/npm/intl-tel-input@24.7.0/build/js/utils.js',
     initialCountry,
